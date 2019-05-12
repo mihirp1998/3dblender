@@ -847,9 +847,9 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     for specified_obj in specified_objects:
         # Choose a random size
         size_name = specified_obj.attributes['size'].attr_val
-        print('\n'*10)
-        print(size_name)
-        print('\n'*10)
+        # print('\n'*10)
+        # print(size_name)
+        # print('\n'*10)
         r = size_mapping[size_name]
 
         # Try to place the object, ensuring that we don't intersect any existing
