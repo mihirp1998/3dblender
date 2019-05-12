@@ -1,0 +1,55 @@
+# Random seed
+# seed: 12134
+seed: 121345
+mode: train
+dataset: CLEVR
+# checkpoint: ./results/CLEVR_64_GEN/PNP-Net-voxel_input-dual_recon-reduced-10k-mae-object_weighted_loss/checkpoints/model_epoch_74.pth
+checkpoint:
+data_folder: CLEVR_64_GEN
+base_dir: ./data/CLEVR/
+exp_dir_name: PNP-Net-voxel_input-dual_recon-reduced-10k-mae-only_tree
+# Hyper parameter
+# hiddim: 160
+# latentdim: 64
+hiddim: 80
+latentdim: 32
+pos_size: [8, 1, 1]
+nr_resnet: 5
+word_size: 16
+ds: 1
+combine_op: gPoE
+describe_op: CAT_gPoE
+# combine_op: DEEP
+# describe_op: DEEP
+# combine_op: PROD
+# describe_op: CAT
+maskweight: 1.0
+# maskweight: -1.0
+bg_bias: False
+normalize: weight_norm
+# normalize: batch_norm
+# loss: cross_entrop
+# loss: binary_entropy
+# loss: l2
+loss: l1
+writer_sigmoid: 0
+# Training
+batch_size: 8
+epochs: 50
+gpu_id: 0
+log_interval: 10
+lr: 0.004
+kl_beta: 5
+alpha_ub: 0.6
+pos_beta: 1
+warmup_iter: 100
+sample_interval: 5
+validate_interval: 1
+save_interval: 4
+class_count: 9
+class_map: ./mains/class_mapping.json
+dual_recon: 1
+# input_mode: feature
+input_mode: voxel
+input_feature_dim: 32
+only_tree: True

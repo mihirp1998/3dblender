@@ -1,0 +1,50 @@
+# Random seed
+# seed: 12134
+seed: 121345
+mode: train
+dataset: CLEVR
+# checkpoint: ./results/CLEVR_32_MULTI_LARGE_2/PNP-Net-dual_recon-reduced-16k-mse/checkpoints/model_epoch_16.pth
+checkpoint:
+data_folder: CLEVR_32_MULTI_LARGE_2
+base_dir: ./data/CLEVR/
+exp_dir_name: PNP-Net-dual_recon-reduced-16k-mse
+# Hyper parameter
+# hiddim: 160
+# latentdim: 64
+hiddim: 80
+latentdim: 32
+pos_size: [8, 1, 1]
+nr_resnet: 5
+word_size: 16
+ds: 1
+combine_op: gPoE
+describe_op: CAT_gPoE
+# combine_op: DEEP
+# describe_op: DEEP
+# combine_op: PROD
+# describe_op: CAT
+maskweight: -1.0
+bg_bias: False
+normalize: weight_norm
+# normalize: batch_norm
+# loss: cross_entropy
+# loss: binary_entropy
+loss: l2
+# loss: l1
+writer_sigmoid: 0
+# Training
+batch_size: 8
+epochs: 50
+gpu_id: 0
+log_interval: 10
+lr: 0.001
+kl_beta: 5
+alpha_ub: 0.6
+pos_beta: 1
+warmup_iter: 100
+sample_interval: 5
+validate_interval: 1
+save_interval: 2
+class_count: 9
+class_map: ./mains/class_mapping.json
+dual_recon: 1
