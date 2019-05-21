@@ -59,6 +59,15 @@ module_dict_all['layout'] = ['right', 'left', 'right-behind', 'left-front', 'lef
 module_dicts_zeroshot = [module_dict_split1, module_dict_split2]
 module_dict_normal = module_dict_all
 
+
+module_dicts_inside = dict()
+module_dicts_inside['describe'] = ['cylinder', 'cube', 'sphere', 'cup']
+module_dicts_inside['combine'] = {'material': ['rubber', 'metal'],
+                              'color': ['cyan', 'brown', 'gray', 'purple', 'green', 'blue', 'yellow', 'red'],
+                              'size': ['large']}
+module_dicts_inside['layout'] = ['inside']
+
+
 pattern_map = {'describe': 0, 'material': 1, 'color': 2, 'size': 3, 'layout': 4}
 
 zs_training_patterns = [(0, 1, 0, 1, 0), (1, 0, 1, 0, 1)]
@@ -66,6 +75,109 @@ zs_training_probs = [1.0 / 3, 2.0 / 3]
 zs_test_patterns = [(1, 1, 1, 1, 1), (0, 0, 0, 0, 0), (0, 0, 1, 1, 1), (1, 1, 0, 0, 0), (0, 1, 1, 1, 0),
                     (1, 0, 0, 0, 1), (0, 1, 1, 1, 1), (1, 0, 0, 0, 0)]
 zs_test_probs = [1.0 / 6, 1.0 / 12, 1.0 / 12, 1.0 / 6, 1.0 / 12, 1.0 / 6, 1.0 / 12, 1.0 / 6]
+
+
+def expand_tree_with_inside(tree, level, parent, memorylist, child_idx, max_layout_level, add_layout_prob, train, obj_count, zero_shot=False,
+                metadata_pattern=None):
+    if parent is None or parent.function == 'layout':
+        # sample module, the module can be either layout or describe here
+        if level + 1 > max_layout_level:
+            module_idx = 1
+        else:
+            module_idx = 0
+        tree.function = module_list[module_idx]
+        if zero_shot and (level == 0 or tree.function == 'describe'):
+            r = random.random()
+            if train:
+                metadata_pattern = _choose_pattern(zs_training_patterns, zs_training_probs, r)
+            else:
+                metadata_pattern = _choose_pattern(zs_test_patterns, zs_test_probs, r)
+        # sample content
+        if zero_shot:
+            assert (metadata_pattern is not None)
+            dict_index = metadata_pattern[pattern_map[tree.function]]
+            module_dict = module_dicts_zeroshot[dict_index]
+        else:
+            module_dict = module_dicts_inside
+
+        if tree.function == 'describe' and child_idx == 1:
+            tree.word = module_dict[tree.function][-1]
+        elif tree.function == 'layout':
+            tree.word = module_dict[tree.function][-1]
+        else:
+            word_id = random.randint(0, len(module_dict[tree.function]) - 2)
+            tree.word = module_dict[tree.function][word_id]
+
+        if tree.function == 'layout':
+            tree.function_obj = Layout(tree.word)
+            # print('add layout')
+        else:
+            obj_count += 1
+            tree.function_obj = Describe(tree.word, obj_count)
+            # print('add describe')
+
+        tree.num_children = children_dict[tree.function]
+        if parent is not None:  # then the parent must be a layout node
+            if child_idx == 0:
+                parent.function_obj.left_child = tree.function_obj
+            else:
+                parent.function_obj.right_child = tree.function_obj
+
+        for i in range(tree.num_children):
+            tree.children.append(Tree())
+            tree.children[i], obj_count = expand_tree_with_inside(tree.children[i], level + 1, tree, [], i, max_layout_level,
+                                           add_layout_prob,
+                                           train, obj_count, zero_shot, metadata_pattern)
+
+    # must contain only one child node, which is a combine node
+    elif parent.function == 'describe' or parent.function == 'combine':
+        # print('add combine')
+        valid = [2]
+        # no need to sample module for now
+        module_id = 0
+        tree.function = module_list[valid[module_id]]
+
+        # sample content
+        # sample which attributes
+        if len(set(attribute_list) - set(memorylist)) <= 1:
+            full_attribute = True
+        else:
+            full_attribute = False
+
+        attribute = random.sample(set(attribute_list) - set(memorylist), 1)[0]
+        memorylist += [attribute]
+
+        if zero_shot:
+            assert (metadata_pattern is not None)
+            dict_idx = metadata_pattern[pattern_map[attribute]]
+            module_dict = module_dicts_zeroshot[dict_idx]
+        else:
+            module_dict = module_dict_normal
+
+        word_id = random.randint(0, len(module_dict[tree.function][attribute]) - 1)
+        tree.word = module_dict[tree.function][attribute][word_id]
+
+        if isinstance(parent.function_obj, Describe):
+            carrier = parent.function_obj
+        else:
+            carrier = parent.function_obj.get_carrier()
+
+        tree.function_obj = Combine(attribute, tree.word)
+        tree.function_obj.set_carrier(carrier)
+        carrier.set_attribute(attribute, tree.function_obj)
+
+        if not full_attribute:
+            tree.num_children = children_dict[tree.function]
+
+            for i in range(tree.num_children):
+                tree.children.append(Tree())
+                tree.children[i], obj_count = expand_tree_with_inside(tree.children[i], level + 1, tree, memorylist, i, max_layout_level,
+                                               add_layout_prob,
+                                               train, obj_count, zero_shot, metadata_pattern)
+    else:
+        raise ValueError('Wrong function.')
+    return tree, obj_count
+
 
 
 def expand_tree(tree, level, parent, memorylist, child_idx, max_layout_level, add_layout_prob, train, obj_count, zero_shot=False,
@@ -247,30 +359,42 @@ def sample_tree(max_layout_level, add_layout_prob, obj_count, zero_shot=False, t
     return tree
 
 
-def sample_tree_flexible(max_layout_level, add_layout_prob, obj_count, zero_shot=False, train=True, arguments=None):
+def sample_tree_flexible(percent_inside_samples, include_inside_config, max_layout_level, add_layout_prob, obj_count, zero_shot=False, train=True, arguments=None):
     tree = Tree()
 
+    if not include_inside_config:
+        expand_func = expand_tree
+    else:
+        rand = random.random()
+        if rand < percent_inside_samples:
+            arguments = {'fix_num_objs':2}
+            expand_func = expand_tree_with_inside
+            max_layout_level = 1
+        else:
+            expand_func = expand_tree
+
     if arguments is None:
-        tree, obj_count = expand_tree(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
+        tree, obj_count = expand_func(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
     else:
         if 'max_num_objs' in arguments:
             max_num_objs = arguments['max_num_objs']
-            tree, obj_count = expand_tree(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
+            tree, obj_count = expand_func(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
             num_objs = count_functions(tree, 'describe')
             while num_objs > max_num_objs:
                 tree = Tree()
-                tree, obj_count = expand_tree(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
+                tree, obj_count = expand_func(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
                 num_objs = count_functions(tree, 'describe')
                 print(num_objs)
         elif 'fix_num_objs' in arguments:
             fix_num_objs = arguments['fix_num_objs']
-            tree, obj_count = expand_tree(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
+            tree, obj_count = expand_func(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
             num_objs = count_functions(tree, 'describe')
             while num_objs != fix_num_objs:
                 tree = Tree()
-                tree, obj_count = expand_tree(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
+                tree, obj_count = expand_func(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot)
                 num_objs = count_functions(tree, 'describe')
     allign_tree(tree, 0)
+
     return tree
 
 
@@ -353,6 +477,13 @@ def _set_describe_bbox(tree, blocks):
     if hasattr(function_obj, 'bbox'):
         block_id = function_obj.block_id
         object_idx = np.where(blocks == block_id)
+        # try:
+        #     x_top = object_idx[0].min()
+        # except Exception as e:
+        #     print(blocks.max())
+        #     print(blocks.min())
+        #     print(np.unique(blocks))
+        #     print(block_id)
         x_top = object_idx[0].min()
         y_top = object_idx[1].min()
         z_top = object_idx[2].min()

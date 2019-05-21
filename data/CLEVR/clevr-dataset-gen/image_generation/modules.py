@@ -26,7 +26,8 @@ class Layout(object):
         'left-front': [((-1.0, 2.0), (1.0, -2.0))],
         'right-front': [((1.0, 2.0), (-1.0, -2.0))],
         'left-behind': [((-1.0, -2.0), (1.0, 2.0))],
-        'right-behind': [((1.0, -2.0), (-1.0, 2.0))]
+        'right-behind': [((1.0, -2.0), (-1.0, 2.0))],
+        'inside': ((-1.5, 0), (1.5, 0))
     }
 
     def __init__(self, layout_type):

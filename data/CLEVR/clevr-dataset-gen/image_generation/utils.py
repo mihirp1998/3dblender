@@ -74,7 +74,7 @@ def set_layer(obj, layer_idx):
     obj.layers[i] = (i == layer_idx)
 
 
-def add_object(object_dir, name, scale, loc, theta=0):
+def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False):
   """
   Load an object from a file. We assume that in the directory object_dir, there
   is a file named "$name.blend" which contains a single object named "$name"
@@ -91,6 +91,22 @@ def add_object(object_dir, name, scale, loc, theta=0):
     if obj.name.startswith(name):
       count += 1
 
+  # Initialize different scales in ecah direction
+  scale_x, scale_y, scale_z = scale, scale, scale
+
+  # Choose a height for inside objects
+  # Also the dimensions of the cup are harcoded right now
+  # Change later
+  height_offset = 0.0
+  if put_obj_inside:
+    if name == 'Cup':
+      scale_x, scale_y, scale_z = 4.5, 4.5, 1.75
+      height_offset = -1.5
+    else:
+      height_offset = 0.1
+    if stored_location is not None:
+      x, y = stored_location
+
   filename = os.path.join(object_dir, '%s.blend' % name, 'Object', name)
   bpy.ops.wm.append(filename=filename)
 
@@ -102,8 +118,8 @@ def add_object(object_dir, name, scale, loc, theta=0):
   x, y = loc
   bpy.context.scene.objects.active = bpy.data.objects[new_name]
   bpy.context.object.rotation_euler[2] = theta
-  bpy.ops.transform.resize(value=(scale, scale, scale))
-  bpy.ops.transform.translate(value=(x, y, scale))
+  bpy.ops.transform.resize(value=(scale_x, scale_y, scale_z))
+  bpy.ops.transform.translate(value=(x, y, scale_z+height_offset))
   return new_name
 
 
@@ -127,7 +143,6 @@ def add_material(name, **properties):
   """
   # Figure out how many materials are already in the scene
   mat_count = len(bpy.data.materials)
-
   # Create a new material; it is not attached to anything and
   # it will be called "Material"
   bpy.ops.material.new()
@@ -137,13 +152,11 @@ def add_material(name, **properties):
   # "Material" and we will still be able to look it up by name
   mat = bpy.data.materials['Material']
   mat.name = 'Material_%d' % mat_count
-
   # Attach the new material to the active object
   # Make sure it doesn't already have materials
   obj = bpy.context.active_object
   assert len(obj.data.materials) == 0
   obj.data.materials.append(mat)
-
   # Find the output node of the new material
   output_node = None
   for n in mat.node_tree.nodes:

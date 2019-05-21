@@ -91,17 +91,21 @@ parser.add_argument('--min_dist', default=0.125, type=float,
                     help="The minimum allowed distance between object centers")
 parser.add_argument('--min_obj_2d_size', default=10, type=float,
                     help="The minimum allowed 2d bounding box size of generated objects")
-parser.add_argument('--radius', default=12, type=float,
+parser.add_argument('--radius', default=13, type=float,
                     help="The distance of the camera from the origin from where the images are rendered")
 parser.add_argument('--scene_size', default=8, type=float,
                     help="The distance of the camera from the origin from where the images are rendered")
 parser.add_argument('--all_views', default=1, type=float,
                     help="Render all 36 views or only the 4 needed for testing")
+parser.add_argument('--include_inside_config', default=1, type=float,
+                    help="Include 'x inside y' scenes ")
+parser.add_argument('--percent_inside_samples', default=0.1, type=float,
+                    help="Percentage of scenes which will have 'inside' layout")
 parser.add_argument('--margin', default=0.0, type=float,
                     help="Along all cardinal directions (left, right, front, back), all " +
                          "objects will be at least this distance apart. This makes resolving " +
                          "spatial relationships slightly less ambiguous.")
-parser.add_argument('--min_pixels_per_object', default=50, type=int,
+parser.add_argument('--min_pixels_per_object', default=20, type=int,
                     help="All objects will have at least this many visible pixels in the " +
                          "final rendered images; this ensures that no objects are fully " +
                          "occluded by other objects.")
@@ -122,21 +126,21 @@ parser.add_argument('--split', default='new',
                     help="Name of the split for which we are rendering. This will be added to " +
                          "the names of rendered images, and will also be stored in the JSON " +
                          "scene structure for each image.")
-parser.add_argument('--output_image_dir', default='../output/CLEVR_64_36_FINAL_DATASET/images/',
+parser.add_argument('--output_image_dir', default='../output/CLEVR_64_36_WITH_INSIDE/images/',
                     help="The directory where output images will be stored. It will be " +
                          "created if it does not exist.")
-parser.add_argument('--output_scene_dir', default='../output/CLEVR_64_36_FINAL_DATASET/scenes/',
+parser.add_argument('--output_scene_dir', default='../output/CLEVR_64_36_WITH_INSIDE/scenes/',
                     help="The directory where output JSON scene structures will be stored. " +
                          "It will be created if it does not exist.")
-parser.add_argument('--output_tree_dir', default='../output/CLEVR_64_36_FINAL_DATASET/trees/',
+parser.add_argument('--output_tree_dir', default='../output/CLEVR_64_36_WITH_INSIDE/trees/',
                     help="The directory where output trees will be stored. It will be " +
                          "created if it does not exist.")
-parser.add_argument('--output_depth_dir', default='../output/CLEVR_64_36_FINAL_DATASET/depth/',
+parser.add_argument('--output_depth_dir', default='../output/CLEVR_64_36_WITH_INSIDE/depth/',
                     help="The directory where output trees will be stored. It will be " +
                          "created if it does not exist.")
-parser.add_argument('--output_scene_file', default='../output/CLEVR_64_36_FINAL_DATASET/CLEVR_scenes.json',
+parser.add_argument('--output_scene_file', default='../output/CLEVR_64_36_WITH_INSIDE/CLEVR_scenes.json',
                     help="Path to write a single JSON file containing all scene information")
-parser.add_argument('--output_blend_dir', default='../output/CLEVR_64_36_FINAL_DATASET/voxels/',
+parser.add_argument('--output_blend_dir', default='../output/CLEVR_64_36_WITH_INSIDE/voxels/',
                     help="The directory where blender scene files will be stored, if the " +
                          "user requested that these files be saved using the " +
                          "--save_blendfiles flag; in this case it will be created if it does " +
@@ -286,8 +290,24 @@ def main(args):
                 break
             except Exception as e:
                 print(e)
-                import sys
-                sys.exit()
+                import traceback
+                print(traceback.print_tb(e.__traceback__))
+                import shutil
+                import glob
+                if os.path.exists(img_path.replace('.png','')):
+                    shutil.rmtree(img_path.replace('.png',''))
+                if os.path.isfile(scene_path):
+                    os.remove(scene_path)
+                voxel_files_del = glob.glob(obj_path.replace('.obj','*'))
+                for file in voxel_files_del:
+                    os.remove(file)
+                if os.path.isfile(scene_path):
+                    os.remove(scene_path)
+                if depth_path is not None and os.path.exists(depth_path.replace('.png','')):
+                    shutil.rmtree(depth_path.replace('.png',''))
+                # print(img_path, scene_path, obj_path, tree_path, depth_path)
+                # import sys
+                # sys.exit()
 
 
     # After rendering all images, combine the JSON files for each scene into a
@@ -508,6 +528,11 @@ def render_scene_with_tree(args,
     # Figure out the left, up, and behind directions along the plane and record
     # them in the scene structure
     camera = bpy.data.objects['Camera']
+
+    # Assign 90,30 as the base scene wrt which trees are generated
+    # 90, 30 corresponds to 0,30 in Ricson's code
+    # camera.location = obj_centered_camera_pos(args.radius, 90.0, 30.0)
+
     plane_normal = plane.data.vertices[0].normal
     print('The plane normal is: ', plane_normal)
     cam_behind = camera.matrix_world.to_quaternion() * Vector((0, 0, -1))
@@ -530,9 +555,6 @@ def render_scene_with_tree(args,
     scene_struct['directions']['above'] = tuple(plane_up)
     scene_struct['directions']['below'] = tuple(-plane_up)
 
-    # Assign 90,30 as the base scene wrt which trees are generated
-    # 90, 30 corresponds to 0,30 in Ricson's code
-    camera.location = obj_centered_camera_pos(args.radius, 90.0, 30.0)
     # Now make some random objects
     objects, blender_objects, phrase_tree = add_objects_from_tree(scene_struct, args, camera, tree_max_level)
 
@@ -722,7 +744,7 @@ def render_scene_with_tree(args,
                 except Exception as e:
                     print(e)
             view_key = str(theta - offset) + '_' + str(phi)
-            scene_struct = get_2d_bboxes(camera, scene_struct, view_key)
+            scene_struct = get_2d_bboxes(args, camera, scene_struct, view_key)
             print('*'*30)
             print('images')
             print(time.time() - start)
@@ -762,7 +784,7 @@ def render_scene_with_tree(args,
         json.dump(scene_struct, f, indent=2)
 
 
-def get_2d_bboxes(camera, scene_struct, view_key):
+def get_2d_bboxes(args, camera, scene_struct, view_key):
     """
     Get 2d bboxes for the current camera view
     """
@@ -805,7 +827,7 @@ def get_2d_bboxes(camera, scene_struct, view_key):
         obj_name_out = obj['shape']
         size_name = obj['size']
         r = size_mapping[size_name]
-        pixel_coords_lefttop, pixel_coords_rightbottom = get_bbox(camera, direction_dict, Vector(obj_loc), obj_name_out, r)
+        pixel_coords_lefttop, pixel_coords_rightbottom = get_bbox(args, camera, direction_dict, Vector(obj_loc), obj_name_out, r)
         scene_struct['objects'][i]['bbox_2d'][view_key] = {}
         scene_struct['objects'][i]['bbox_2d'][view_key]['pixel_coords_lefttop'] = pixel_coords_lefttop
         scene_struct['objects'][i]['bbox_2d'][view_key]['pixel_coords_rightbottom'] = pixel_coords_rightbottom
@@ -818,9 +840,11 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     """
     # tree = sample_tree(tree_max_level, add_layout_prob=args.add_layout_prob, zero_shot=args.zero_shot, train=args.train_flag)
     # tree = sample_tree_flexible(max_layout_level=2, add_layout_prob=0.6, zero_shot=False, train=True, arguments={'fix_num_objs':2})
-    tree = sample_tree_flexible(max_layout_level=2, add_layout_prob=0.6, obj_count=0, zero_shot=False, train=True, arguments={'max_num_objs':args.max_objects})
-    # tree = sample_tree_flexible(max_layout_level=2, add_layout_prob=0.6, obj_count=0, zero_shot=False, train=True, arguments={'fix_num_objs':2})
 
+
+
+    tree = sample_tree_flexible(args.percent_inside_samples, args.include_inside_config, max_layout_level=2, add_layout_prob=0.8, obj_count=0, zero_shot=False, train=True, arguments={'max_num_objs':args.max_objects})
+    # tree = sample_tree_flexible(args.percent_inside_samples, args.include_inside_config, max_layout_level=2, add_layout_prob=0.6, obj_count=0, zero_shot=False, train=True, arguments={'fix_num_objs':3})
     specified_objects = extract_objects(tree)
 
     # Load the property file
@@ -844,12 +868,25 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     positions = []
     objects = []
     blender_objects = []
-    for specified_obj in specified_objects:
+
+    # Check if the current scene contains inside configuration
+    put_obj_inside = False
+    stored_location = None
+    min_dist = args.min_dist
+    if tree.word == 'inside':
+        put_obj_inside = True
+        min_dist = 0.0
+
+    for obj_counter, specified_obj in enumerate(specified_objects):
         # Choose a random size
         size_name = specified_obj.attributes['size'].attr_val
         # print('\n'*10)
         # print(size_name)
         # print('\n'*10)
+
+        # with open("test_sampled.txt", "a") as myfile:
+        #     myfile.write(size_name + '\n')
+
         r = size_mapping[size_name]
 
         # Try to place the object, ensuring that we don't intersect any existing
@@ -857,12 +894,16 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
         # objects along all cardinal directions.
         num_tries = 0
         while True:
+            if stored_location:
+                break
+
             # If we try and fail to place an object too many times, then delete all
             # the objects in the scene and start over.
             num_tries += 1
             if num_tries > args.max_retries:
                 for obj in blender_objects:
                     utils.delete_object(obj)
+                print(obj_counter)
                 return add_objects_from_tree(scene_struct, args, camera, tree_max_level)
 
             x = specified_obj.position[0] * scene_struct['directions']['right'][0] + specified_obj.position[1] * \
@@ -879,7 +920,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             for (xx, yy, rr) in positions:
                 dx, dy = x - xx, y - yy
                 dist = math.sqrt(dx * dx + dy * dy)
-                if dist - r - rr < args.min_dist:
+                if dist - r - rr < min_dist:
                     print((xx, yy, rr))
                     print((x, y, r))
                     print('dist is ', dist)
@@ -918,13 +959,18 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
         # For cube, adjust the size a bit, and make rotate it to make it face forward
         if obj_name_out == 'cube':
-            r /= math.sqrt(2)
+            # r /= math.sqrt(2)
             theta = 45
         else:
             theta = 0
 
+        # If inside configuration exists in the sample, store the location for the next object
+        # This is used to put the object at the same location, but inside the current object
+        if put_obj_inside and stored_location is None:
+            stored_location = (x, y)
+
         # Actually add the object to the scene
-        obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta)
+        obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside)
         obj = bpy.context.object
         blender_objects.append(obj)
         positions.append((x, y, r))
@@ -933,6 +979,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
         mat_name_out = specified_obj.attributes['material'].attr_val
         mat_name = material_mapping[mat_name_out]
         # mat_name, mat_name_out = random.choice(material_mapping)
+
         print(mat_name, mat_name_out)
         utils.add_material(mat_name, Color=rgba)
 
@@ -941,23 +988,23 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
         bpy.data.objects[obj_name].active_material.name = 'blockid_' + str(object_id)
 
         # Record data about the object in the scene data structure
-        pixel_coords_lefttop, pixel_coords_rightbottom = get_bbox(camera, scene_struct, obj.location, obj_name_out, r)
+        pixel_coords_lefttop, pixel_coords_rightbottom = get_bbox(args, camera, scene_struct, obj.location, obj_name_out, r)
 
         # guarantee that objects are all in the image
-        if pixel_coords_lefttop[0] < 0 or pixel_coords_lefttop[1] < 0 or pixel_coords_rightbottom[0] >= args.width or \
-                pixel_coords_rightbottom[1] >= args.height:
-            for obj in blender_objects:
-                utils.delete_object(obj)
-            return add_objects_from_tree(scene_struct, args, camera, tree_max_level)
+        if not put_obj_inside:
+            if pixel_coords_lefttop[0] < 0 or pixel_coords_lefttop[1] < 0 or pixel_coords_rightbottom[0] >= args.width or \
+                    pixel_coords_rightbottom[1] >= args.height:
+                for obj in blender_objects:
+                    utils.delete_object(obj)
+                return add_objects_from_tree(scene_struct, args, camera, tree_max_level)
 
-        # remove objects that are too small
-        if not is_valid_bbox(pixel_coords_lefttop, pixel_coords_rightbottom, size_threshold=args.min_obj_2d_size):
-            for obj in blender_objects:
-                utils.delete_object(obj)
-            return add_objects_from_tree(scene_struct, args, camera, tree_max_level)
+            # remove objects that are too small
+            if not is_valid_bbox(pixel_coords_lefttop, pixel_coords_rightbottom, size_threshold=args.min_obj_2d_size):
+                for obj in blender_objects:
+                    utils.delete_object(obj)
+                return add_objects_from_tree(scene_struct, args, camera, tree_max_level)
 
         specified_obj.bbox = (pixel_coords_lefttop, pixel_coords_rightbottom)
-
         objects.append({
             'obj_id': 'blockid_' + str(object_id),
             'obj_name': obj_name,
@@ -974,13 +1021,17 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
     # Check that all objects are at least partially visible in the rendered image
     all_visible = check_visibility(blender_objects, args.min_pixels_per_object)
-    if not all_visible:
+    if not all_visible and not put_obj_inside:
         # If any of the objects are fully occluded then start over; delete all
         # objects from the scene and place them all again.
         print('Some objects are occluded; replacing objects')
         for obj in blender_objects:
             utils.delete_object(obj)
+        print('-'*300 + 'VISIBILITY' + '-'*300)
         return add_objects_from_tree(scene_struct, args, camera, tree_max_level)
+
+    # with open("test_chosen.txt", "a") as myfile:
+    #     myfile.write(size_name + '\n')
 
     # In case of 1 object, add extra objects to center the first object. Later make the new ones invisible in voxels
     if len(specified_objects) == 1:
@@ -992,19 +1043,19 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             rand_id = np.random.randint(1,255)
 
         offset_extra = np.random.uniform(2,4)
-        obj_name_1 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra + offset_extra, y_extra + offset_extra), theta=theta_extra)
+        obj_name_1 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra + offset_extra, y_extra + offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
         utils.add_material(mat_name, Color=rgba)
         bpy.data.objects[obj_name_1].active_material.name = 'blockid_' + str(rand_id)
 
         offset_extra = np.random.uniform(2,4)
-        obj_name_2 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra - offset_extra, y_extra - offset_extra), theta=theta_extra)
+        obj_name_2 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra - offset_extra, y_extra - offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
         utils.add_material(mat_name, Color=rgba)
         bpy.data.objects[obj_name_2].active_material.name = 'blockid_' + str(rand_id)
 
     return objects, blender_objects, tree
 
 
-def get_bbox(camera, scene_struct, obj_loc, obj_type, r):
+def get_bbox(args, camera, scene_struct, obj_loc, obj_type, r):
     if obj_type == 'sphere':
         points_3d = [obj_loc + r * vector for vector in get_sphere_unit_vectors(scene_struct['directions'])]
     elif obj_type == 'cube':
@@ -1028,6 +1079,8 @@ def get_bbox(camera, scene_struct, obj_loc, obj_type, r):
                      ]
     elif obj_type == 'cylinder':
         points_3d = [obj_loc + r * vector for vector in get_cylinder_unit_vectors(scene_struct['directions'])]
+    elif obj_type == 'cup':
+        return (0,0), (args.width, args.height)
     else:
         raise RuntimeError('invalid object type name')
 
@@ -1072,6 +1125,17 @@ def get_sphere_unit_vectors(directions):
 
     return points_3d
 
+def get_cup_unit_vectors(directions):
+    points_3d = list()
+    for i in range(30):
+        alpha = i * math.pi / 30 - math.pi / 2  # range in (-pi/2, pi/2)
+        for j in range(30):
+            theta = (2 * j * math.pi) / 30  # range in (0, 2*pi)
+            points_3d.append(
+                math.cos(alpha) * math.cos(theta) * Vector(directions['right']) + math.cos(alpha) * math.sin(theta) *
+                Vector(directions['front']) + math.sin(alpha) * Vector(directions['above']))
+
+    return points_3d
 
 def compute_all_relationships(scene_struct, eps=0.2):
     """

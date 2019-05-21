@@ -50,8 +50,9 @@ def adapt_tree(tree):
     return tree
 
 # path = 'data/CLEVR/CLEVR_64_OBJ_FULL_TRY/trees/train/CLEVR_new_000000.tree'
-path = 'data/CLEVR/clevr-dataset-gen/output/CLEVR_64_OBJ_FULL_TRY/trees/train/CLEVR_new_000103.tree'
-path = 'data/CLEVR/CLEVR_64_GEN/trees/train/CLEVR_new_000114.tree'
+path = 'data/CLEVR/clevr-dataset-gen/output/CLEVR_64_36_WITH_INSIDE/trees/train/CLEVR_new_000001.tree'
+# path = 'data/CLEVR/CLEVR_64_GEN/trees/train/CLEVR_new_000114.tree'
+# path = 'CLEVR_64_NEW/trees/train/CLEVR_new_000001.tree'
 paths = [path]
 for p in paths:
     with open(p, 'rb') as f:
