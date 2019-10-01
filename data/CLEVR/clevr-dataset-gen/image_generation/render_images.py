@@ -1,4 +1,3 @@
-#dumped till  1270 
 
 # Copyright 2017-present, Facebook, Inc.
 # All rights reserved.
@@ -85,9 +84,9 @@ parser.add_argument('--shape_color_combos_json', default=None,
 # Settings for objects
 parser.add_argument('--min_objects', default=1, type=int,
                     help="The minimum number of objects to place in each scene")
-parser.add_argument('--max_objects', default=5, type=int,
+parser.add_argument('--max_objects', default=3, type=int,
                     help="The maximum number of objects to place in each scene")
-parser.add_argument('--min_dist', default=0.125, type=float,
+parser.add_argument('--min_dist', default=0.2, type=float,
                     help="The minimum allowed distance between object centers")
 parser.add_argument('--min_obj_2d_size', default=10, type=float,
                     help="The minimum allowed 2d bounding box size of generated objects")
@@ -97,10 +96,16 @@ parser.add_argument('--scene_size', default=8, type=float,
                     help="The distance of the camera from the origin from where the images are rendered")
 parser.add_argument('--all_views', default=1, type=float,
                     help="Render all 36 views or only the 4 needed for testing")
-parser.add_argument('--include_inside_config', default=1, type=float,
+parser.add_argument('--filter_out_of_view', default=0, type=int,
+                    help="Reject scenes with out-of-view objects")
+parser.add_argument('--allow_floating_objects', default=0, type=int,
+                    help="Boolean flag for whether to allow floating objects")
+parser.add_argument('--include_inside_config', default=0, type=float,
                     help="Include 'x inside y' scenes ")
 parser.add_argument('--percent_inside_samples', default=0.1, type=float,
-                    help="Percentage of scenes which will have 'inside' layout")
+                    help="Percentage of scenes which will have 'inside' layout"),
+parser.add_argument('--back_front_only_flag', default=0, type=int,
+                    help="Flag for rendering samples with only configurations 'back' and 'front'")
 parser.add_argument('--margin', default=0.0, type=float,
                     help="Along all cardinal directions (left, right, front, back), all " +
                          "objects will be at least this distance apart. This makes resolving " +
@@ -112,6 +117,12 @@ parser.add_argument('--min_pixels_per_object', default=20, type=int,
 parser.add_argument('--max_retries', default=50, type=int,
                     help="The number of times to try placing an object before giving up and " +
                          "re-placing all objects in the scene.")
+parser.add_argument('--render_from_given_objects', default=0, type=int,
+                    help="Flag for rendering samples using given object descriptions. Uses the dictionary" + 
+                    "specified in the argument 'given_objects_json_path'")
+parser.add_argument('--given_objects_json_path', default='given_objects.json',
+                    help="Path for the object descriptions to be used for rendering if " +
+                    " the flag 'render_from_given_objects' is on")
 
 # Output settings
 parser.add_argument('--start_idx', default=0, type=int,
@@ -126,28 +137,30 @@ parser.add_argument('--split', default='new',
                     help="Name of the split for which we are rendering. This will be added to " +
                          "the names of rendered images, and will also be stored in the JSON " +
                          "scene structure for each image.")
-parser.add_argument('--output_image_dir', default='../output/CLEVR_64_36_WITH_INSIDE/images/',
+parser.add_argument('--dataset_name', default='CLEVR_DATASET_DEFAULT',
+                    help="Name of the main folder")
+parser.add_argument('--output_image_dir', default='../output/{}/images/',
                     help="The directory where output images will be stored. It will be " +
                          "created if it does not exist.")
-parser.add_argument('--output_scene_dir', default='../output/CLEVR_64_36_WITH_INSIDE/scenes/',
+parser.add_argument('--output_scene_dir', default='../output/{}/scenes/',
                     help="The directory where output JSON scene structures will be stored. " +
                          "It will be created if it does not exist.")
-parser.add_argument('--output_tree_dir', default='../output/CLEVR_64_36_WITH_INSIDE/trees/',
+parser.add_argument('--output_tree_dir', default='../output/{}/trees/',
                     help="The directory where output trees will be stored. It will be " +
                          "created if it does not exist.")
-parser.add_argument('--output_depth_dir', default='../output/CLEVR_64_36_WITH_INSIDE/depth/',
+parser.add_argument('--output_depth_dir', default='../output/{}/depth/',
                     help="The directory where output trees will be stored. It will be " +
                          "created if it does not exist.")
-parser.add_argument('--output_scene_file', default='../output/CLEVR_64_36_WITH_INSIDE/CLEVR_scenes.json',
+parser.add_argument('--output_scene_file', default='../output/{}/CLEVR_scenes.json',
                     help="Path to write a single JSON file containing all scene information")
-parser.add_argument('--output_blend_dir', default='../output/CLEVR_64_36_WITH_INSIDE/voxels/',
+parser.add_argument('--output_blend_dir', default='../output/{}/voxels/',
                     help="The directory where blender scene files will be stored, if the " +
                          "user requested that these files be saved using the " +
                          "--save_blendfiles flag; in this case it will be created if it does " +
                          "not already exist.")
 parser.add_argument('--save_depth_maps', type=int, default=0,
                     help="The flag for whether to save a depth map")
-parser.add_argument('--save_blendfiles', type=int, default=0,
+parser.add_argument('--save_blendfiles', type=int, default=1,
                     help="Setting --save_blendfiles 1 will cause the blender scene file for " +
                          "each generated image to be stored in the directory specified by " +
                          "the --output_blend_dir flag. These files are not saved by default " +
@@ -216,6 +229,13 @@ def main(args):
         args.zero_shot = True
     else:
         args.zero_shot = False
+
+    args.output_image_dir = args.output_image_dir.format(args.dataset_name)
+    args.output_scene_dir = args.output_scene_dir.format(args.dataset_name)
+    args.output_tree_dir = args.output_tree_dir.format(args.dataset_name)
+    args.output_depth_dir = args.output_depth_dir.format(args.dataset_name)
+    args.output_blend_dir = args.output_blend_dir.format(args.dataset_name)
+    args.output_scene_file = args.output_scene_file.format(args.dataset_name)
 
     if args.train_flag:
         split_output_image_dir = os.path.join(args.output_image_dir, 'train/')
@@ -555,8 +575,56 @@ def render_scene_with_tree(args,
     scene_struct['directions']['above'] = tuple(plane_up)
     scene_struct['directions']['below'] = tuple(-plane_up)
 
-    # Now make some random objects
-    objects, blender_objects, phrase_tree = add_objects_from_tree(scene_struct, args, camera, tree_max_level)
+    if args.render_from_given_objects:
+        # Read the specified objects json and render the given objects
+        # with open(args.given_objects_json_path, 'rb') as f:
+        #     given_objects = pickle.load(f)
+        # add_objects_from_given_trees(args, given_objects)
+
+        with open(args.given_objects_json_path, 'r') as f:
+            given_objects = json.load(f)
+        add_objects_from_given_trees(args, given_objects)
+
+        # Render the scene for all thetas and phis and dump the scene data structure
+        # Ricson's code needs an offset of 90 for the thetas/phis to align.
+        offset = 90
+        if args.all_views:
+            THETAS = list(range(0+offset, 360+offset, 30))
+            PHIS = list(range(20, 80, 20))
+            PHIS.insert(0, 12)
+        else:
+            THETAS = list(range(0+offset, 360+offset, 90))
+            PHIS = [40]
+
+        image_name = os.path.basename(output_image).split('.png')[0]
+        output_image = os.path.join(os.path.dirname(output_image), image_name)
+
+        # Render original view
+        render_args.filepath = os.path.join(output_image, image_name + '_orig.png')
+        while True:
+            try:
+                bpy.ops.render.render(write_still=True)
+                break
+            except Exception as e:
+                print(e)
+
+        # Render all other views
+        for theta in THETAS:
+            for phi in PHIS:
+                start = time.time()
+                camera.location = obj_centered_camera_pos(args.radius, theta, phi)
+                render_args.filepath = os.path.join(output_image, image_name + '_' + str(theta - offset) + '_' + str(phi) + '.png')
+                while True:
+                    try:
+                        bpy.ops.render.render(write_still=True)
+                        break
+                    except Exception as e:
+                        print(e)
+        import sys
+        sys.exit()
+    else:
+        # Now make some random objects
+        objects, blender_objects, phrase_tree = add_objects_from_tree(scene_struct, args, camera, tree_max_level)
 
     # Store scene struct
     scene_struct['objects'] = objects
@@ -709,6 +777,7 @@ def render_scene_with_tree(args,
     if args.all_views:
         THETAS = list(range(0+offset, 360+offset, 30))
         PHIS = list(range(20, 80, 20))
+        PHIS.insert(0, 12)
     else:
         THETAS = list(range(0+offset, 360+offset, 90))
         PHIS = [40]
@@ -828,11 +897,53 @@ def get_2d_bboxes(args, camera, scene_struct, view_key):
         size_name = obj['size']
         r = size_mapping[size_name]
         pixel_coords_lefttop, pixel_coords_rightbottom = get_bbox(args, camera, direction_dict, Vector(obj_loc), obj_name_out, r)
+        if args.filter_out_of_view:
+            assert args.width == args.height
+            flag_1 = 0 <= pixel_coords_lefttop[0] < args.width
+            flag_2 = 0 <= pixel_coords_lefttop[1] < args.width
+            flag_3 = 0 <= pixel_coords_rightbottom[1] < args.width
+            flag_4 = 0 <= pixel_coords_rightbottom[1] < args.width
+            if not (flag_1 and flag_2 and flag_3 and flag_4):
+                raise Exception('Object out of view')
+
         scene_struct['objects'][i]['bbox_2d'][view_key] = {}
         scene_struct['objects'][i]['bbox_2d'][view_key]['pixel_coords_lefttop'] = pixel_coords_lefttop
         scene_struct['objects'][i]['bbox_2d'][view_key]['pixel_coords_rightbottom'] = pixel_coords_rightbottom
     return scene_struct
 
+
+def add_objects_from_given_trees(args, objects):
+    """
+    Add given objects at the given positions
+    """
+    # Load the property file
+    with open(args.properties_json, 'r') as f:
+        properties = json.load(f)
+        color_name_to_rgba = {}
+        for name, rgb in properties['colors'].items():
+            rgba = [float(c) / 255.0 for c in rgb] + [1.0]
+            color_name_to_rgba[name] = rgba
+        material_mapping = properties['materials']
+        object_mapping = properties['shapes']
+        size_mapping = properties['sizes']
+
+    for specified_obj in objects[:1]:
+        shape = specified_obj['shape']
+        size = specified_obj['size']
+        color = specified_obj['color']
+        material = specified_obj['texture']
+        location = specified_obj['location']
+
+        obj_name = object_mapping[shape]
+        scale = size_mapping[size]
+
+        # Add the given object at specified location
+        obj_name = utils.add_given_object(args, obj_name, scale, location)
+
+        # Add material and color to the given object
+        mat_name = material_mapping[material]
+        rgba = color_name_to_rgba[color]
+        utils.add_material(mat_name, Color=rgba)
 
 def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     """
@@ -842,9 +953,8 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     # tree = sample_tree_flexible(max_layout_level=2, add_layout_prob=0.6, zero_shot=False, train=True, arguments={'fix_num_objs':2})
 
 
-
-    tree = sample_tree_flexible(args.percent_inside_samples, args.include_inside_config, max_layout_level=2, add_layout_prob=0.8, obj_count=0, zero_shot=False, train=True, arguments={'max_num_objs':args.max_objects})
-    # tree = sample_tree_flexible(args.percent_inside_samples, args.include_inside_config, max_layout_level=2, add_layout_prob=0.6, obj_count=0, zero_shot=False, train=True, arguments={'fix_num_objs':3})
+    tree = sample_tree_flexible(args.percent_inside_samples, args.include_inside_config, max_layout_level=2, add_layout_prob=0.8, obj_count=0, zero_shot=False, train=True, arguments={'max_num_objs':args.max_objects, 'min_num_objs':args.min_objects}, back_front_only_flag=args.back_front_only_flag)
+    # tree = sample_tree_flexible(args.percent_inside_samples, args.include_inside_config, max_layout_level=2, add_layout_prob=0.6, obj_count=0, zero_shot=False, train=True, arguments={'fix_num_objs':args.max_objects}, back_front_only_flag=args.back_front_only_flag)
     specified_objects = extract_objects(tree)
 
     # Load the property file
@@ -970,7 +1080,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             stored_location = (x, y)
 
         # Actually add the object to the scene
-        obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside)
+        obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
         obj = bpy.context.object
         blender_objects.append(obj)
         positions.append((x, y, r))
@@ -1080,7 +1190,8 @@ def get_bbox(args, camera, scene_struct, obj_loc, obj_type, r):
     elif obj_type == 'cylinder':
         points_3d = [obj_loc + r * vector for vector in get_cylinder_unit_vectors(scene_struct['directions'])]
     elif obj_type == 'cup':
-        return (0,0), (args.width, args.height)
+        # Copied from cylinder's 3d point calculation. Replace later
+        points_3d = [obj_loc + r * vector for vector in get_cylinder_unit_vectors(scene_struct['directions'])]
     else:
         raise RuntimeError('invalid object type name')
 

@@ -74,7 +74,7 @@ def set_layer(obj, layer_idx):
     obj.layers[i] = (i == layer_idx)
 
 
-def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False):
+def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5):
   """
   Load an object from a file. We assume that in the directory object_dir, there
   is a file named "$name.blend" which contains a single object named "$name"
@@ -98,14 +98,22 @@ def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_
   # Also the dimensions of the cup are harcoded right now
   # Change later
   height_offset = 0.0
+  if name == 'Cup':
+    scale_x, scale_y, scale_z = 4.5, 4.5, 1.75
+    height_offset = -1.5
+  else:
+    height_offset = 0.1
   if put_obj_inside:
-    if name == 'Cup':
-      scale_x, scale_y, scale_z = 4.5, 4.5, 1.75
-      height_offset = -1.5
-    else:
-      height_offset = 0.1
+    # if name == 'Cup':
+    #   scale_x, scale_y, scale_z = 4.5, 4.5, 1.75
+    #   height_offset = -1.5
+    # else:
+    #   height_offset = 0.1
     if stored_location is not None:
       x, y = stored_location
+
+  if allow_floating and random.random() < percentage_floating_objects:
+    height_offset = random.uniform(1, 2)
 
   filename = os.path.join(object_dir, '%s.blend' % name, 'Object', name)
   bpy.ops.wm.append(filename=filename)
@@ -122,6 +130,47 @@ def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_
   bpy.ops.transform.translate(value=(x, y, scale_z+height_offset))
   return new_name
 
+def add_given_object(args, name, scale, loc, theta=0):
+  count = 0
+  for obj in bpy.data.objects:
+    if obj.name.startswith(name):
+      count += 1
+
+  # Initialize different scales in ecah direction
+  scale_x, scale_y, scale_z = scale, scale, scale  
+  if name == 'Cup':
+    scale_x, scale_y, scale_z = 4.5, 4.5, 1.75
+
+  filename = os.path.join(args.shape_dir, '%s.blend' % name, 'Object', name)
+  bpy.ops.wm.append(filename=filename)
+
+  # Give it a new name to avoid conflicts
+  new_name = '%s_%d' % (name, count)
+  bpy.data.objects[name].name = new_name
+
+  # Set the new object as active, then rotate, scale, and translate it
+  y, z, x, h, d, w = loc
+
+  assert args.width == args.height
+  # No idea why this is needed
+  y = y + 8
+
+  y = (args.width / 2.0) + (args.width / 2.0) - y
+  x = x + (w / 2.0)
+  y = y + (h / 2.0)
+  z = z + (d / 2.0)
+  scene_range = 6.0
+  x =  -scene_range + (2*scene_range * ((x - w) / (args.width - 2*w)))
+  y =  -scene_range + (2*scene_range * ((y - h) / (args.width - 2*h)))
+  z = z - args.width/2
+  z =  0.0 + (scene_range * ((z - d) / (args.width - 2*d)))
+
+  z = scale_z
+  bpy.context.scene.objects.active = bpy.data.objects[new_name]
+  bpy.context.object.rotation_euler[2] = theta
+  bpy.ops.transform.resize(value=(scale_x, scale_y, scale_z))
+  bpy.ops.transform.translate(value=(x, y, z))
+  return new_name
 
 def load_materials(material_dir):
   """

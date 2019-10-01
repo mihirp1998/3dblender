@@ -27,7 +27,9 @@ class Layout(object):
         'right-front': [((1.0, 2.0), (-1.0, -2.0))],
         'left-behind': [((-1.0, -2.0), (1.0, 2.0))],
         'right-behind': [((1.0, -2.0), (-1.0, 2.0))],
-        'inside': ((-1.5, 0), (1.5, 0))
+        'inside': ((-1.5, 0), (1.5, 0)),
+        'front': ((0, 1.75), (0, -1.75)),
+        'behind': ((0, -1.75), (0, 1.75))
     }
 
     def __init__(self, layout_type):
@@ -50,7 +52,7 @@ class Layout(object):
 
 
 class Describe(object):
-    random_pos_range = 2
+    random_pos_range = 1.5
 
     def __init__(self, object_type, obj_count):
         self.object_type = object_type

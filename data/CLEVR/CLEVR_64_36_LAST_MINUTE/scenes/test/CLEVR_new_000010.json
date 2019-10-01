@@ -1,0 +1,594 @@
+{
+  "split": "new",
+  "image_filename": "CLEVR_new_000010.png",
+  "image_index": 10,
+  "relationships": {
+    "front": [
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [],
+      []
+    ],
+    "left": [
+      [
+        1,
+        3
+      ],
+      [],
+      [
+        0,
+        1,
+        3
+      ],
+      [
+        1
+      ]
+    ],
+    "behind": [
+      [],
+      [
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "right": [
+      [
+        2
+      ],
+      [
+        0,
+        2,
+        3
+      ],
+      [],
+      [
+        0,
+        2
+      ]
+    ]
+  },
+  "objects": [
+    {
+      "3d_coords": [
+        -3.00980544090271,
+        3.136990547180176,
+        1.0
+      ],
+      "material": "rubber",
+      "size": "large",
+      "obj_id": "blockid_1",
+      "pixel_coords_rightbottom": [
+        39,
+        23
+      ],
+      "shape": "sphere",
+      "rotation": 0,
+      "pixel_coords_lefttop": [
+        29,
+        13
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_rightbottom": [
+            52,
+            24
+          ],
+          "pixel_coords_lefttop": [
+            42,
+            14
+          ]
+        },
+        "180_90": {
+          "pixel_coords_rightbottom": [
+            20,
+            20
+          ],
+          "pixel_coords_lefttop": [
+            8,
+            8
+          ]
+        },
+        "90_90": {
+          "pixel_coords_rightbottom": [
+            21,
+            54
+          ],
+          "pixel_coords_lefttop": [
+            6,
+            45
+          ]
+        },
+        "240_90": {
+          "pixel_coords_rightbottom": [
+            46,
+            13
+          ],
+          "pixel_coords_lefttop": [
+            33,
+            2
+          ]
+        },
+        "90_40": {
+          "pixel_coords_rightbottom": [
+            17,
+            47
+          ],
+          "pixel_coords_lefttop": [
+            3,
+            33
+          ]
+        },
+        "240_40": {
+          "pixel_coords_rightbottom": [
+            42,
+            21
+          ],
+          "pixel_coords_lefttop": [
+            33,
+            12
+          ]
+        },
+        "180_40": {
+          "pixel_coords_rightbottom": [
+            22,
+            24
+          ],
+          "pixel_coords_lefttop": [
+            13,
+            14
+          ]
+        },
+        "0_40": {
+          "pixel_coords_rightbottom": [
+            61,
+            48
+          ],
+          "pixel_coords_lefttop": [
+            46,
+            34
+          ]
+        },
+        "0_90": {
+          "pixel_coords_rightbottom": [
+            56,
+            56
+          ],
+          "pixel_coords_lefttop": [
+            44,
+            44
+          ]
+        },
+        "270_90": {
+          "pixel_coords_rightbottom": [
+            58,
+            19
+          ],
+          "pixel_coords_lefttop": [
+            43,
+            10
+          ]
+        }
+      },
+      "color": "blue",
+      "obj_name": "Sphere_0"
+    },
+    {
+      "3d_coords": [
+        -0.8301138281822205,
+        -2.1472010612487793,
+        0.75
+      ],
+      "material": "metal",
+      "size": "small",
+      "obj_id": "blockid_2",
+      "pixel_coords_rightbottom": [
+        22,
+        35
+      ],
+      "shape": "sphere",
+      "rotation": 0,
+      "pixel_coords_lefttop": [
+        12,
+        25
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_rightbottom": [
+            25,
+            30
+          ],
+          "pixel_coords_lefttop": [
+            16,
+            22
+          ]
+        },
+        "180_90": {
+          "pixel_coords_rightbottom": [
+            32,
+            49
+          ],
+          "pixel_coords_lefttop": [
+            23,
+            40
+          ]
+        },
+        "90_90": {
+          "pixel_coords_rightbottom": [
+            50,
+            40
+          ],
+          "pixel_coords_lefttop": [
+            39,
+            34
+          ]
+        },
+        "240_90": {
+          "pixel_coords_rightbottom": [
+            24,
+            38
+          ],
+          "pixel_coords_lefttop": [
+            14,
+            30
+          ]
+        },
+        "90_40": {
+          "pixel_coords_rightbottom": [
+            49,
+            36
+          ],
+          "pixel_coords_lefttop": [
+            40,
+            27
+          ]
+        },
+        "240_40": {
+          "pixel_coords_rightbottom": [
+            23,
+            34
+          ],
+          "pixel_coords_lefttop": [
+            15,
+            26
+          ]
+        },
+        "180_40": {
+          "pixel_coords_rightbottom": [
+            31,
+            42
+          ],
+          "pixel_coords_lefttop": [
+            22,
+            32
+          ]
+        },
+        "0_40": {
+          "pixel_coords_rightbottom": [
+            40,
+            26
+          ],
+          "pixel_coords_lefttop": [
+            32,
+            19
+          ]
+        },
+        "0_90": {
+          "pixel_coords_rightbottom": [
+            41,
+            24
+          ],
+          "pixel_coords_lefttop": [
+            32,
+            15
+          ]
+        },
+        "270_90": {
+          "pixel_coords_rightbottom": [
+            25,
+            30
+          ],
+          "pixel_coords_lefttop": [
+            14,
+            24
+          ]
+        }
+      },
+      "color": "green",
+      "obj_name": "Sphere_1"
+    },
+    {
+      "3d_coords": [
+        2.74399995803833,
+        0.45241570472717285,
+        0.75
+      ],
+      "material": "rubber",
+      "size": "small",
+      "obj_id": "blockid_3",
+      "pixel_coords_rightbottom": [
+        56,
+        41
+      ],
+      "shape": "cube",
+      "rotation": 45,
+      "pixel_coords_lefttop": [
+        41,
+        26
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_rightbottom": [
+            41,
+            47
+          ],
+          "pixel_coords_lefttop": [
+            30,
+            33
+          ]
+        },
+        "180_90": {
+          "pixel_coords_rightbottom": [
+            53,
+            34
+          ],
+          "pixel_coords_lefttop": [
+            43,
+            25
+          ]
+        },
+        "90_90": {
+          "pixel_coords_rightbottom": [
+            37,
+            20
+          ],
+          "pixel_coords_lefttop": [
+            21,
+            12
+          ]
+        },
+        "240_90": {
+          "pixel_coords_rightbottom": [
+            50,
+            49
+          ],
+          "pixel_coords_lefttop": [
+            35,
+            40
+          ]
+        },
+        "90_40": {
+          "pixel_coords_rightbottom": [
+            34,
+            26
+          ],
+          "pixel_coords_lefttop": [
+            26,
+            16
+          ]
+        },
+        "240_40": {
+          "pixel_coords_rightbottom": [
+            50,
+            44
+          ],
+          "pixel_coords_lefttop": [
+            38,
+            30
+          ]
+        },
+        "180_40": {
+          "pixel_coords_rightbottom": [
+            53,
+            33
+          ],
+          "pixel_coords_lefttop": [
+            42,
+            22
+          ]
+        },
+        "0_40": {
+          "pixel_coords_rightbottom": [
+            21,
+            36
+          ],
+          "pixel_coords_lefttop": [
+            10,
+            24
+          ]
+        },
+        "0_90": {
+          "pixel_coords_rightbottom": [
+            21,
+            39
+          ],
+          "pixel_coords_lefttop": [
+            11,
+            30
+          ]
+        },
+        "270_90": {
+          "pixel_coords_rightbottom": [
+            43,
+            52
+          ],
+          "pixel_coords_lefttop": [
+            27,
+            44
+          ]
+        }
+      },
+      "color": "red",
+      "obj_name": "SmoothCube_v2_0"
+    },
+    {
+      "3d_coords": [
+        1.095919132232666,
+        -1.4422050714492798,
+        1.0
+      ],
+      "material": "metal",
+      "size": "large",
+      "obj_id": "blockid_4",
+      "pixel_coords_rightbottom": [
+        37,
+        39
+      ],
+      "shape": "sphere",
+      "rotation": 0,
+      "pixel_coords_lefttop": [
+        22,
+        24
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_rightbottom": [
+            29,
+            38
+          ],
+          "pixel_coords_lefttop": [
+            17,
+            26
+          ]
+        },
+        "180_90": {
+          "pixel_coords_rightbottom": [
+            44,
+            46
+          ],
+          "pixel_coords_lefttop": [
+            33,
+            35
+          ]
+        },
+        "90_90": {
+          "pixel_coords_rightbottom": [
+            48,
+            30
+          ],
+          "pixel_coords_lefttop": [
+            33,
+            21
+          ]
+        },
+        "240_90": {
+          "pixel_coords_rightbottom": [
+            34,
+            47
+          ],
+          "pixel_coords_lefttop": [
+            21,
+            37
+          ]
+        },
+        "90_40": {
+          "pixel_coords_rightbottom": [
+            45,
+            29
+          ],
+          "pixel_coords_lefttop": [
+            34,
+            19
+          ]
+        },
+        "240_40": {
+          "pixel_coords_rightbottom": [
+            34,
+            40
+          ],
+          "pixel_coords_lefttop": [
+            21,
+            28
+          ]
+        },
+        "180_40": {
+          "pixel_coords_rightbottom": [
+            45,
+            39
+          ],
+          "pixel_coords_lefttop": [
+            33,
+            27
+          ]
+        },
+        "0_40": {
+          "pixel_coords_rightbottom": [
+            32,
+            28
+          ],
+          "pixel_coords_lefttop": [
+            21,
+            18
+          ]
+        },
+        "0_90": {
+          "pixel_coords_rightbottom": [
+            31,
+            29
+          ],
+          "pixel_coords_lefttop": [
+            20,
+            18
+          ]
+        },
+        "270_90": {
+          "pixel_coords_rightbottom": [
+            31,
+            43
+          ],
+          "pixel_coords_lefttop": [
+            16,
+            34
+          ]
+        }
+      },
+      "color": "purple",
+      "obj_name": "Sphere_2"
+    }
+  ],
+  "directions": {
+    "front": [
+      0.754490315914154,
+      -0.6563112735748291,
+      -0.0
+    ],
+    "left": [
+      -0.6563112735748291,
+      -0.7544902563095093,
+      0.0
+    ],
+    "below": [
+      -0.0,
+      -0.0,
+      -1.0
+    ],
+    "right": [
+      0.6563112735748291,
+      0.7544902563095093,
+      -0.0
+    ],
+    "behind": [
+      -0.754490315914154,
+      0.6563112735748291,
+      0.0
+    ],
+    "above": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  }
+}

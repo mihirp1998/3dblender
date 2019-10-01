@@ -1,0 +1,453 @@
+{
+  "objects": [
+    {
+      "pixel_coords_lefttop": [
+        25,
+        20
+      ],
+      "pixel_coords_rightbottom": [
+        38,
+        33
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_lefttop": [
+            26,
+            22
+          ],
+          "pixel_coords_rightbottom": [
+            37,
+            33
+          ]
+        },
+        "0_40": {
+          "pixel_coords_lefttop": [
+            26,
+            22
+          ],
+          "pixel_coords_rightbottom": [
+            38,
+            33
+          ]
+        },
+        "90_90": {
+          "pixel_coords_lefttop": [
+            25,
+            28
+          ],
+          "pixel_coords_rightbottom": [
+            40,
+            36
+          ]
+        },
+        "240_90": {
+          "pixel_coords_lefttop": [
+            25,
+            27
+          ],
+          "pixel_coords_rightbottom": [
+            38,
+            37
+          ]
+        },
+        "180_40": {
+          "pixel_coords_lefttop": [
+            26,
+            22
+          ],
+          "pixel_coords_rightbottom": [
+            38,
+            34
+          ]
+        },
+        "90_40": {
+          "pixel_coords_lefttop": [
+            27,
+            22
+          ],
+          "pixel_coords_rightbottom": [
+            38,
+            33
+          ]
+        },
+        "0_90": {
+          "pixel_coords_lefttop": [
+            26,
+            26
+          ],
+          "pixel_coords_rightbottom": [
+            38,
+            37
+          ]
+        },
+        "240_40": {
+          "pixel_coords_lefttop": [
+            26,
+            22
+          ],
+          "pixel_coords_rightbottom": [
+            37,
+            33
+          ]
+        },
+        "180_90": {
+          "pixel_coords_lefttop": [
+            26,
+            27
+          ],
+          "pixel_coords_rightbottom": [
+            38,
+            38
+          ]
+        },
+        "270_90": {
+          "pixel_coords_lefttop": [
+            24,
+            28
+          ],
+          "pixel_coords_rightbottom": [
+            39,
+            36
+          ]
+        }
+      },
+      "size": "large",
+      "shape": "sphere",
+      "obj_name": "Sphere_0",
+      "3d_coords": [
+        0.023953303694725037,
+        -0.058069612830877304,
+        1.0
+      ],
+      "material": "metal",
+      "rotation": 0,
+      "obj_id": "blockid_1",
+      "color": "purple"
+    },
+    {
+      "pixel_coords_lefttop": [
+        37,
+        12
+      ],
+      "pixel_coords_rightbottom": [
+        49,
+        24
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_lefttop": [
+            48,
+            15
+          ],
+          "pixel_coords_rightbottom": [
+            62,
+            29
+          ]
+        },
+        "0_40": {
+          "pixel_coords_lefttop": [
+            37,
+            37
+          ],
+          "pixel_coords_rightbottom": [
+            58,
+            59
+          ]
+        },
+        "90_90": {
+          "pixel_coords_lefttop": [
+            -7,
+            38
+          ],
+          "pixel_coords_rightbottom": [
+            18,
+            48
+          ]
+        },
+        "240_90": {
+          "pixel_coords_lefttop": [
+            39,
+            3
+          ],
+          "pixel_coords_rightbottom": [
+            60,
+            17
+          ]
+        },
+        "180_40": {
+          "pixel_coords_lefttop": [
+            18,
+            10
+          ],
+          "pixel_coords_rightbottom": [
+            29,
+            22
+          ]
+        },
+        "90_40": {
+          "pixel_coords_lefttop": [
+            -7,
+            26
+          ],
+          "pixel_coords_rightbottom": [
+            13,
+            44
+          ]
+        },
+        "0_90": {
+          "pixel_coords_lefttop": [
+            36,
+            50
+          ],
+          "pixel_coords_rightbottom": [
+            50,
+            66
+          ]
+        },
+        "240_40": {
+          "pixel_coords_lefttop": [
+            40,
+            11
+          ],
+          "pixel_coords_rightbottom": [
+            52,
+            24
+          ]
+        },
+        "180_90": {
+          "pixel_coords_lefttop": [
+            14,
+            -2
+          ],
+          "pixel_coords_rightbottom": [
+            28,
+            14
+          ]
+        },
+        "270_90": {
+          "pixel_coords_lefttop": [
+            46,
+            16
+          ],
+          "pixel_coords_rightbottom": [
+            71,
+            26
+          ]
+        }
+      },
+      "size": "large",
+      "shape": "cube",
+      "obj_name": "SmoothCube_v2_0",
+      "3d_coords": [
+        -1.8014520406723022,
+        4.367231369018555,
+        1.0
+      ],
+      "material": "metal",
+      "rotation": 45,
+      "obj_id": "blockid_2",
+      "color": "brown"
+    },
+    {
+      "pixel_coords_lefttop": [
+        18,
+        29
+      ],
+      "pixel_coords_rightbottom": [
+        30,
+        40
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_lefttop": [
+            15,
+            28
+          ],
+          "pixel_coords_rightbottom": [
+            24,
+            36
+          ]
+        },
+        "0_40": {
+          "pixel_coords_lefttop": [
+            24,
+            19
+          ],
+          "pixel_coords_rightbottom": [
+            31,
+            26
+          ]
+        },
+        "90_90": {
+          "pixel_coords_lefttop": [
+            39,
+            24
+          ],
+          "pixel_coords_rightbottom": [
+            50,
+            30
+          ]
+        },
+        "240_90": {
+          "pixel_coords_lefttop": [
+            19,
+            39
+          ],
+          "pixel_coords_rightbottom": [
+            29,
+            46
+          ]
+        },
+        "180_40": {
+          "pixel_coords_lefttop": [
+            33,
+            32
+          ],
+          "pixel_coords_rightbottom": [
+            43,
+            42
+          ]
+        },
+        "90_40": {
+          "pixel_coords_lefttop": [
+            39,
+            22
+          ],
+          "pixel_coords_rightbottom": [
+            47,
+            30
+          ]
+        },
+        "0_90": {
+          "pixel_coords_lefttop": [
+            23,
+            15
+          ],
+          "pixel_coords_rightbottom": [
+            31,
+            24
+          ]
+        },
+        "240_40": {
+          "pixel_coords_lefttop": [
+            18,
+            31
+          ],
+          "pixel_coords_rightbottom": [
+            28,
+            41
+          ]
+        },
+        "180_90": {
+          "pixel_coords_lefttop": [
+            33,
+            40
+          ],
+          "pixel_coords_rightbottom": [
+            41,
+            49
+          ]
+        },
+        "270_90": {
+          "pixel_coords_lefttop": [
+            14,
+            34
+          ],
+          "pixel_coords_rightbottom": [
+            25,
+            40
+          ]
+        }
+      },
+      "size": "small",
+      "shape": "sphere",
+      "obj_name": "Sphere_1",
+      "3d_coords": [
+        0.888749361038208,
+        -2.15458083152771,
+        0.75
+      ],
+      "material": "rubber",
+      "rotation": 0,
+      "obj_id": "blockid_3",
+      "color": "red"
+    }
+  ],
+  "image_index": 5,
+  "directions": {
+    "front": [
+      0.754490315914154,
+      -0.6563112735748291,
+      -0.0
+    ],
+    "left": [
+      -0.6563112735748291,
+      -0.7544902563095093,
+      0.0
+    ],
+    "below": [
+      -0.0,
+      -0.0,
+      -1.0
+    ],
+    "right": [
+      0.6563112735748291,
+      0.7544902563095093,
+      -0.0
+    ],
+    "behind": [
+      -0.754490315914154,
+      0.6563112735748291,
+      0.0
+    ],
+    "above": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "relationships": {
+    "behind": [
+      [
+        1
+      ],
+      [],
+      [
+        0,
+        1
+      ]
+    ],
+    "front": [
+      [
+        2
+      ],
+      [
+        0,
+        2
+      ],
+      []
+    ],
+    "left": [
+      [
+        2
+      ],
+      [
+        0,
+        2
+      ],
+      []
+    ],
+    "right": [
+      [
+        1
+      ],
+      [],
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  "split": "new",
+  "image_filename": "CLEVR_new_000005.png"
+}

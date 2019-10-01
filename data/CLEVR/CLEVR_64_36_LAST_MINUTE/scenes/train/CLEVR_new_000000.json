@@ -1,0 +1,453 @@
+{
+  "objects": [
+    {
+      "pixel_coords_lefttop": [
+        9,
+        24
+      ],
+      "pixel_coords_rightbottom": [
+        21,
+        38
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_lefttop": [
+            14,
+            20
+          ],
+          "pixel_coords_rightbottom": [
+            23,
+            31
+          ]
+        },
+        "0_40": {
+          "pixel_coords_lefttop": [
+            33,
+            16
+          ],
+          "pixel_coords_rightbottom": [
+            40,
+            27
+          ]
+        },
+        "90_90": {
+          "pixel_coords_lefttop": [
+            40,
+            34
+          ],
+          "pixel_coords_rightbottom": [
+            53,
+            41
+          ]
+        },
+        "240_90": {
+          "pixel_coords_lefttop": [
+            11,
+            31
+          ],
+          "pixel_coords_rightbottom": [
+            23,
+            39
+          ]
+        },
+        "180_40": {
+          "pixel_coords_lefttop": [
+            20,
+            32
+          ],
+          "pixel_coords_rightbottom": [
+            31,
+            46
+          ]
+        },
+        "90_40": {
+          "pixel_coords_lefttop": [
+            42,
+            26
+          ],
+          "pixel_coords_rightbottom": [
+            52,
+            38
+          ]
+        },
+        "0_90": {
+          "pixel_coords_lefttop": [
+            33,
+            12
+          ],
+          "pixel_coords_rightbottom": [
+            42,
+            23
+          ]
+        },
+        "240_40": {
+          "pixel_coords_lefttop": [
+            12,
+            24
+          ],
+          "pixel_coords_rightbottom": [
+            22,
+            36
+          ]
+        },
+        "180_90": {
+          "pixel_coords_lefttop": [
+            22,
+            41
+          ],
+          "pixel_coords_rightbottom": [
+            31,
+            52
+          ]
+        },
+        "270_90": {
+          "pixel_coords_lefttop": [
+            11,
+            23
+          ],
+          "pixel_coords_rightbottom": [
+            24,
+            30
+          ]
+        }
+      },
+      "size": "small",
+      "shape": "cylinder",
+      "obj_name": "SmoothCylinder_0",
+      "3d_coords": [
+        -0.9153891205787659,
+        -2.463665008544922,
+        0.75
+      ],
+      "material": "rubber",
+      "rotation": 0,
+      "obj_id": "blockid_5",
+      "color": "blue"
+    },
+    {
+      "pixel_coords_lefttop": [
+        16,
+        37
+      ],
+      "pixel_coords_rightbottom": [
+        38,
+        59
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_lefttop": [
+            -2,
+            35
+          ],
+          "pixel_coords_rightbottom": [
+            14,
+            50
+          ]
+        },
+        "0_40": {
+          "pixel_coords_lefttop": [
+            11,
+            13
+          ],
+          "pixel_coords_rightbottom": [
+            21,
+            22
+          ]
+        },
+        "90_90": {
+          "pixel_coords_lefttop": [
+            46,
+            8
+          ],
+          "pixel_coords_rightbottom": [
+            60,
+            16
+          ]
+        },
+        "240_90": {
+          "pixel_coords_lefttop": [
+            17,
+            54
+          ],
+          "pixel_coords_rightbottom": [
+            30,
+            65
+          ]
+        },
+        "180_40": {
+          "pixel_coords_lefttop": [
+            49,
+            36
+          ],
+          "pixel_coords_rightbottom": [
+            65,
+            51
+          ]
+        },
+        "90_40": {
+          "pixel_coords_lefttop": [
+            44,
+            13
+          ],
+          "pixel_coords_rightbottom": [
+            54,
+            23
+          ]
+        },
+        "0_90": {
+          "pixel_coords_lefttop": [
+            6,
+            5
+          ],
+          "pixel_coords_rightbottom": [
+            18,
+            17
+          ]
+        },
+        "240_40": {
+          "pixel_coords_lefttop": [
+            12,
+            42
+          ],
+          "pixel_coords_rightbottom": [
+            29,
+            59
+          ]
+        },
+        "180_90": {
+          "pixel_coords_lefttop": [
+            46,
+            47
+          ],
+          "pixel_coords_rightbottom": [
+            58,
+            59
+          ]
+        },
+        "270_90": {
+          "pixel_coords_lefttop": [
+            4,
+            48
+          ],
+          "pixel_coords_rightbottom": [
+            18,
+            56
+          ]
+        }
+      },
+      "size": "large",
+      "shape": "sphere",
+      "obj_name": "Sphere_0",
+      "3d_coords": [
+        3.4075121879577637,
+        -3.5779495239257812,
+        1.0
+      ],
+      "material": "rubber",
+      "rotation": 0,
+      "obj_id": "blockid_6",
+      "color": "green"
+    },
+    {
+      "pixel_coords_lefttop": [
+        34,
+        14
+      ],
+      "pixel_coords_rightbottom": [
+        45,
+        27
+      ],
+      "bbox_2d": {
+        "270_40": {
+          "pixel_coords_lefttop": [
+            42,
+            17
+          ],
+          "pixel_coords_rightbottom": [
+            54,
+            31
+          ]
+        },
+        "0_40": {
+          "pixel_coords_lefttop": [
+            34,
+            30
+          ],
+          "pixel_coords_rightbottom": [
+            49,
+            50
+          ]
+        },
+        "90_90": {
+          "pixel_coords_lefttop": [
+            5,
+            35
+          ],
+          "pixel_coords_rightbottom": [
+            22,
+            44
+          ]
+        },
+        "240_90": {
+          "pixel_coords_lefttop": [
+            37,
+            10
+          ],
+          "pixel_coords_rightbottom": [
+            52,
+            23
+          ]
+        },
+        "180_40": {
+          "pixel_coords_lefttop": [
+            21,
+            13
+          ],
+          "pixel_coords_rightbottom": [
+            31,
+            26
+          ]
+        },
+        "90_40": {
+          "pixel_coords_lefttop": [
+            6,
+            24
+          ],
+          "pixel_coords_rightbottom": [
+            20,
+            41
+          ]
+        },
+        "0_90": {
+          "pixel_coords_lefttop": [
+            33,
+            43
+          ],
+          "pixel_coords_rightbottom": [
+            46,
+            58
+          ]
+        },
+        "240_40": {
+          "pixel_coords_lefttop": [
+            37,
+            13
+          ],
+          "pixel_coords_rightbottom": [
+            47,
+            27
+          ]
+        },
+        "180_90": {
+          "pixel_coords_lefttop": [
+            18,
+            6
+          ],
+          "pixel_coords_rightbottom": [
+            31,
+            21
+          ]
+        },
+        "270_90": {
+          "pixel_coords_lefttop": [
+            42,
+            20
+          ],
+          "pixel_coords_rightbottom": [
+            59,
+            29
+          ]
+        }
+      },
+      "size": "large",
+      "shape": "cylinder",
+      "obj_name": "SmoothCylinder_1",
+      "3d_coords": [
+        -1.2460615634918213,
+        3.0208072662353516,
+        1.0
+      ],
+      "material": "metal",
+      "rotation": 0,
+      "obj_id": "blockid_7",
+      "color": "red"
+    }
+  ],
+  "image_index": 0,
+  "directions": {
+    "front": [
+      0.754490315914154,
+      -0.6563112735748291,
+      -0.0
+    ],
+    "left": [
+      -0.6563112735748291,
+      -0.7544902563095093,
+      0.0
+    ],
+    "below": [
+      -0.0,
+      -0.0,
+      -1.0
+    ],
+    "right": [
+      0.6563112735748291,
+      0.7544902563095093,
+      -0.0
+    ],
+    "behind": [
+      -0.754490315914154,
+      0.6563112735748291,
+      0.0
+    ],
+    "above": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "relationships": {
+    "behind": [
+      [
+        2
+      ],
+      [
+        0,
+        2
+      ],
+      []
+    ],
+    "front": [
+      [
+        1
+      ],
+      [],
+      [
+        0,
+        1
+      ]
+    ],
+    "left": [
+      [],
+      [
+        0
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "right": [
+      [
+        1,
+        2
+      ],
+      [
+        2
+      ],
+      []
+    ]
+  },
+  "split": "new",
+  "image_filename": "CLEVR_new_000000.png"
+}

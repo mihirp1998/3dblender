@@ -1,3 +1,24 @@
+# // Modified render 5 object
+{
+	"scene": [{"shape": "sphere", "size": "large", "color": "yellow", "texture": "metal", "location": [38, 32, 34,  8,  6,  8]},
+		{"shape": "sphere", "size": "large", "color": "blue", "texture": "metal", "location": [22, 32, 28,  8,  6,  8]},
+		{"shape": "sphere", "size": "large", "color": "green", "texture": "metal", "location": [32, 32, 26,  8,  6,  8]},
+		{"shape": "sphere", "size": "large", "color": "yellow", "texture": "metal", "location": [12, 32, 20,  8,  6,  8]},
+		{"shape": "cylinder", "size": "large", "color": "red", "texture": "metal", "location": [20, 32, 18,  8,  6,  8]}]
+}
+
+# // Modified render 4 object
+{
+	"scene": [{"shape": "sphere", "size": "large", "color": "blue", "texture": "metal", "location": [30, 32, 26,  8,  6,  8]},
+		{"shape": "sphere", "size": "large", "color": "brown", "texture": "metal", "location": [38, 32, 19,  8,  6,  8]},
+		{"shape": "sphere", "size": "large", "color": "yellow", "texture": "metal", "location": [19, 32, 20,  8,  6,  8]},
+		{"shape": "cylinder", "size": "large", "color": "red", "texture": "metal", "location": [26, 32, 14,  8,  6,  8]}]
+}
+
+
+
+
+
 x = []
 voxel_inp = np.zeros((voxel_size, voxel_size, voxel_size, class_count))
 for obj in scene_obj_list:
@@ -84,3 +105,56 @@ singularity shell --writable -B /projects:/projects --nv $IMG
 /home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 5000 --max_objects 3 --use_gpu 1 --save_depth_maps 1  --start_idx 0
 
 
+import os
+import pickle
+import json
+path = '/Users/ashar/Downloads/test/'
+folders = os.listdir(path)
+for i in folders:
+    if i[0] != '.':
+        full_pickle_path = os.path.join(path, i, 'blender_info.p')
+        full_json_path = os.path.join(path, i, 'blender_info.json')
+        with open(full_pickle_path, 'rb') as f:
+            given_objects = pickle.load(f)
+        for obj in given_objects:
+            obj['location'] = obj['location'].tolist()
+        with open(full_json_path, 'w') as f:
+            json.dump(given_objects, f)
+
+
+
+
+
+
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 200 --max_objects 2 --save_depth_maps 0  --start_idx 0 --all_views 1 --include_inside_config 0
+
+
+cd 
+IMG="tensorflow-ubuntu-16.04.3-nvidia-375.26_wzy.img"
+module load singularity
+singularity shell --writable -B /projects:/projects --nv $IMG
+
+cd projects/text2scene/3dProbNeuralProgNet/data/CLEVR/clevr-dataset-gen/image_generation/
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 200 --max_objects 2 --save_depth_maps 0  --start_idx 0 --all_views 1 --use_gpu 1 --back_front_only_flag 1
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 200 --max_objects 3 --save_depth_maps 0  --start_idx 0 --all_views 1 --use_gpu 1 --back_front_only_flag 1
+
+
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 600 --max_objects 1 --save_depth_maps 0  --start_idx 0 --all_views 1 --use_gpu 1 --include_inside_config 1 --percent_inside_samples 0.5
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 800 --max_objects 3 --use_gpu 1 --start_idx 0
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 800 --max_objects 3 --use_gpu 1 --start_idx 0 --allow_floating_objects 1
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 800 --max_objects 4 --use_gpu 1 --start_idx 0 --radius 15
+
+
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 800 --min_objects 2 --max_objects 3 --use_gpu 1 --start_idx 0 --save_depth_maps 1 --allow_floating_objects 1 --dataset_name CLEVR_64_36_WITH_FLOATING_WITH_DEPTH_NEW
+
+/home/sajaved/blender/blender --background --python render_images.py -- --save_blendfiles 1 --num_images 800 --min_objects 2 --max_objects 3 --use_gpu 1 --start_idx 0 --save_depth_maps 1 --allow_floating_objects 0 --dataset_name CLEVR_64_36_WITH_DEPTH_NEW
+
+blender --background --python render_images.py -- --render_from_given_objects 1 --dataset_name CLEVR_RENDERED_FROM_GIVEN --all_views 0
