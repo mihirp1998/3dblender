@@ -116,6 +116,11 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   if allow_floating and random.random() < percentage_floating_objects:
     height_offset = random.uniform(1, 2)
 
+  # st()
+
+  # filename = os.path.join(object_dir, '%s.blend' % name, 'Object', name)
+  # bpy.ops.wm.append(filename=filename)
+
   filename = os.path.join(object_dir, '%s.obj' % name)
   print("Filename from where object file will be loaded: ", filename)
   bpy.ops.import_scene.obj(filepath=filename)
@@ -123,7 +128,13 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   # Give it a new name to avoid conflicts
   new_name = '%s_%d' % (name, count)
   #st()
-  bpy.data.objects[name].name = new_name
+  # st()
+
+  bpy.context.scene.objects.active = bpy.context.selected_objects[0]
+  #bpy.ops.object.join()
+  bpy.context.scene.objects.active.name = new_name
+  print("Selected obj:", bpy.context.selected_objects[0])
+  # bpy.data.objects[name].name = new_name
 
   # Set the new object as active, then rotate, scale, and translate it
   x, y = loc
@@ -133,6 +144,8 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   bpy.ops.transform.translate(value=(x, y, scale_z+height_offset))
   return new_name
 
+def kill():
+  import os; os._exit(1)
 
 def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5):
   """
