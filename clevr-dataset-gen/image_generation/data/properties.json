@@ -1,9 +1,7 @@
 {
   "shapes": {
-    "cube": "SmoothCube_v2",
-    "sphere": "Sphere",
-    "cylinder": "SmoothCylinder",
-    "cup": "Cup"
+
+    "tomato": "Tomato_material"
   },
   "colors": {
     "gray": [87, 87, 87],

@@ -23,7 +23,8 @@ import time
 from mathutils import Matrix
 from math import radians
 import binvox_rw
-
+import ipdb
+st = ipdb.set_trace
 
 """
 Renders random scenes using Blender, each with with a random number of objects;
@@ -956,6 +957,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     tree = sample_tree_flexible(args.percent_inside_samples, args.include_inside_config, max_layout_level=2, add_layout_prob=0.8, obj_count=0, zero_shot=False, train=True, arguments={'max_num_objs':args.max_objects, 'min_num_objs':args.min_objects}, back_front_only_flag=args.back_front_only_flag)
     # tree = sample_tree_flexible(args.percent_inside_samples, args.include_inside_config, max_layout_level=2, add_layout_prob=0.6, obj_count=0, zero_shot=False, train=True, arguments={'fix_num_objs':args.max_objects}, back_front_only_flag=args.back_front_only_flag)
     specified_objects = extract_objects(tree)
+    print("Specified objects are: ", specified_objects)
 
     # Load the property file
     with open(args.properties_json, 'r') as f:
@@ -966,6 +968,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             color_name_to_rgba[name] = rgba
         material_mapping = properties['materials']
         object_mapping = properties['shapes']
+        print("Object mapping is: ", object_mapping)
         size_mapping = properties['sizes']
         print('size mapping:', size_mapping)
         print('object mapping', object_mapping)
@@ -1079,19 +1082,26 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
         if put_obj_inside and stored_location is None:
             stored_location = (x, y)
 
+        # st()
         # Actually add the object to the scene
-        obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
+        #obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
+        obj_name = utils.add_object_from_obj_file(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
         obj = bpy.context.object
         blender_objects.append(obj)
         positions.append((x, y, r))
 
         # Attach a random material
-        mat_name_out = specified_obj.attributes['material'].attr_val
-        mat_name = material_mapping[mat_name_out]
+        #mat_name_out = specified_obj.attributes['material'].attr_val
+        #TODO: right now hardcoding material name for tomato. Change this so that each vegitable can have multiple 
+        #material names and then pick randomly from them.
+        # mat_name = material_mapping[mat_name_out]
+        mat_name = "tomato_one"
+        mat_name_out = mat_name
         # mat_name, mat_name_out = random.choice(material_mapping)
 
         print(mat_name, mat_name_out)
-        utils.add_material(mat_name, Color=rgba)
+        
+        #utils.add_material(mat_name, Color=rgba)
 
         # Assign block id to material for binvox to work its magic
         object_id = specified_obj.get_block_id()
@@ -1115,6 +1125,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
                 return add_objects_from_tree(scene_struct, args, camera, tree_max_level)
 
         specified_obj.bbox = (pixel_coords_lefttop, pixel_coords_rightbottom)
+        #Color name is just a placeholder for real data thing.
         objects.append({
             'obj_id': 'blockid_' + str(object_id),
             'obj_name': obj_name,
@@ -1144,23 +1155,23 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     #     myfile.write(size_name + '\n')
 
     # In case of 1 object, add extra objects to center the first object. Later make the new ones invisible in voxels
-    if len(specified_objects) == 1:
-        x_extra, y_extra, r_extra = positions[0]
-        r_extra = 0.2
-        theta_extra = 0
-        rand_id = np.random.randint(1,255)
-        while rand_id == object_id:
-            rand_id = np.random.randint(1,255)
+    # if len(specified_objects) == 1:
+    #     x_extra, y_extra, r_extra = positions[0]
+    #     r_extra = 0.2
+    #     theta_extra = 0
+    #     rand_id = np.random.randint(1,255)
+    #     while rand_id == object_id:
+    #         rand_id = np.random.randint(1,255)
 
-        offset_extra = np.random.uniform(2,4)
-        obj_name_1 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra + offset_extra, y_extra + offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
-        utils.add_material(mat_name, Color=rgba)
-        bpy.data.objects[obj_name_1].active_material.name = 'blockid_' + str(rand_id)
+    #     offset_extra = np.random.uniform(2,4)
+    #     obj_name_1 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra + offset_extra, y_extra + offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
+    #     utils.add_material(mat_name, Color=rgba)
+    #     bpy.data.objects[obj_name_1].active_material.name = 'blockid_' + str(rand_id)
 
-        offset_extra = np.random.uniform(2,4)
-        obj_name_2 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra - offset_extra, y_extra - offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
-        utils.add_material(mat_name, Color=rgba)
-        bpy.data.objects[obj_name_2].active_material.name = 'blockid_' + str(rand_id)
+    #     offset_extra = np.random.uniform(2,4)
+    #     obj_name_2 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra - offset_extra, y_extra - offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
+    #     utils.add_material(mat_name, Color=rgba)
+    #     bpy.data.objects[obj_name_2].active_material.name = 'blockid_' + str(rand_id)
 
     return objects, blender_objects, tree
 
@@ -1192,6 +1203,9 @@ def get_bbox(args, camera, scene_struct, obj_loc, obj_type, r):
     elif obj_type == 'cup':
         # Copied from cylinder's 3d point calculation. Replace later
         points_3d = [obj_loc + r * vector for vector in get_cylinder_unit_vectors(scene_struct['directions'])]
+    elif obj_type == 'tomato':
+        # Copied from sphere's 3d point calculation. Replace later
+        points_3d = [obj_loc + r * vector for vector in get_sphere_unit_vectors(scene_struct['directions'])]
     else:
         raise RuntimeError('invalid object type name')
 
@@ -1376,7 +1390,9 @@ if __name__ == '__main__':
     if INSIDE_BLENDER:
         # Run normally
         argv = utils.extract_args()
+        print("argv are: ", argv)
         args = parser.parse_args(argv)
+        print("args are: ", args)
         main(args)
     elif '--help' in sys.argv or '-h' in sys.argv:
         parser.print_help()

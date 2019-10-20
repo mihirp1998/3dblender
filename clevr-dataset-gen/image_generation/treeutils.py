@@ -34,7 +34,7 @@ module_dict_all = dict()
 # objects list
 module_dict_split1['describe'] = ['cube']
 module_dict_split2['describe'] = ['cylinder', 'sphere']
-module_dict_all['describe'] = ['cylinder', 'cube', 'sphere']
+module_dict_all['describe'] = ['tomato']
 # module_dict_all['describe'] = ['cup']
 
 # attributes list
@@ -188,6 +188,7 @@ def expand_tree_with_inside(tree, level, parent, memorylist, child_idx, max_layo
     return tree, obj_count
 
 
+# expand_func(tree, 0, None, [], 0, max_layout_level, add_layout_prob, train, obj_count, zero_shot=zero_shot, back_front_only_flag=back_front_only_flag)
 
 def expand_tree(tree, level, parent, memorylist, child_idx, max_layout_level, add_layout_prob, train, obj_count, zero_shot=False,
                 metadata_pattern=None, back_front_only_flag=False):
@@ -268,7 +269,7 @@ def expand_tree(tree, level, parent, memorylist, child_idx, max_layout_level, ad
             module_dict = module_dict_normal
 
         word_id = random.randint(0, len(module_dict[tree.function][attribute]) - 1)
-        tree.word = module_dict[tree.function][attribute][word_id]
+        tree.word = module_dict[tree.function][attribute][word_id]  ##TODO: change material/color here for specific vegitable
 
         if isinstance(parent.function_obj, Describe):
             carrier = parent.function_obj

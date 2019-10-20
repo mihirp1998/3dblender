@@ -7,7 +7,8 @@
 
 import sys, random, os
 import bpy, bpy_extras
-
+import ipdb
+st = ipdb.set_trace
 
 """
 Some utility functions for interacting with Blender
@@ -74,6 +75,65 @@ def set_layer(obj, layer_idx):
     obj.layers[i] = (i == layer_idx)
 
 
+def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5):
+  """
+  Load an object from an obj file. We assume that in the directory object_dir, there
+  is a file named "$name.obj" which contains a single object named "$name"
+  that has unit size and is centered at the origin.
+
+  - scale: scalar giving the size that the object should be in the scene
+  - loc: tuple (x, y) giving the coordinates on the ground plane where the
+    object should be placed.
+  """
+  # First figure out how many of this object are already in the scene so we can
+  # give the new object a unique name
+  count = 0
+  for obj in bpy.data.objects:
+    if obj.name.startswith(name):
+      count += 1
+
+  # Initialize different scales in ecah direction
+  scale_x, scale_y, scale_z = scale, scale, scale
+
+  # Choose a height for inside objects
+  # Also the dimensions of the cup are harcoded right now
+  # Change later
+  height_offset = 0.0
+  if name == 'Cup':
+    scale_x, scale_y, scale_z = 4.5, 4.5, 1.75
+    height_offset = -1.5
+  else:
+    height_offset = 0.1
+  if put_obj_inside:
+    # if name == 'Cup':
+    #   scale_x, scale_y, scale_z = 4.5, 4.5, 1.75
+    #   height_offset = -1.5
+    # else:
+    #   height_offset = 0.1
+    if stored_location is not None:
+      x, y = stored_location
+
+  if allow_floating and random.random() < percentage_floating_objects:
+    height_offset = random.uniform(1, 2)
+
+  filename = os.path.join(object_dir, '%s.obj' % name)
+  print("Filename from where object file will be loaded: ", filename)
+  bpy.ops.import_scene.obj(filepath=filename)
+
+  # Give it a new name to avoid conflicts
+  new_name = '%s_%d' % (name, count)
+  #st()
+  bpy.data.objects[name].name = new_name
+
+  # Set the new object as active, then rotate, scale, and translate it
+  x, y = loc
+  bpy.context.scene.objects.active = bpy.data.objects[new_name]
+  bpy.context.object.rotation_euler[2] = theta
+  bpy.ops.transform.resize(value=(scale_x, scale_y, scale_z))
+  bpy.ops.transform.translate(value=(x, y, scale_z+height_offset))
+  return new_name
+
+
 def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5):
   """
   Load an object from a file. We assume that in the directory object_dir, there
@@ -120,6 +180,7 @@ def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_
 
   # Give it a new name to avoid conflicts
   new_name = '%s_%d' % (name, count)
+  #st()
   bpy.data.objects[name].name = new_name
 
   # Set the new object as active, then rotate, scale, and translate it
