@@ -9,6 +9,7 @@ import sys, random, os
 import bpy, bpy_extras
 import ipdb
 st = ipdb.set_trace
+import version_name
 
 """
 Some utility functions for interacting with Blender
@@ -37,9 +38,14 @@ def parse_args(parser, argv=None):
 # I wonder if there's a better way to do this?
 def delete_object(obj):
   """ Delete a specified blender object """
-  for o in bpy.data.objects:
-    o.select = False
-  obj.select = True
+  if version_name.NEW_VERSION:
+    for o in bpy.data.objects:
+        o.select_set(False)
+    obj.select_set(True)
+  else:
+    for o in bpy.data.objects:
+      o.select = False
+    obj.select = True
   bpy.ops.object.delete()
 
 
@@ -69,10 +75,19 @@ def get_camera_coords(cam, pos):
 def set_layer(obj, layer_idx):
   """ Move an object to a particular layer """
   # Set the target layer to True first because an object must always be on
-  # at least one layer.
+  # at least one layer.  
   obj.layers[layer_idx] = True
   for i in range(len(obj.layers)):
     obj.layers[i] = (i == layer_idx)
+
+
+def set_layer_new(obj, collection,old_collection):
+  """ Move an object to a particular layer """
+  # Set the target layer to True first because an object must always be on
+  # at least one layer.  
+  collection.objects.link(obj)
+  old_collection.objects.unlink(obj)
+
 
 
 def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5):
@@ -122,23 +137,29 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   # bpy.ops.wm.append(filename=filename)
 
   filename = os.path.join(object_dir, '%s.obj' % name)
+
   print("Filename from where object file will be loaded: ", filename)
+
   bpy.ops.import_scene.obj(filepath=filename)
 
   # Give it a new name to avoid conflicts
   new_name = '%s_%d' % (name, count)
-  #st()
-  # st()
 
-  bpy.context.scene.objects.active = bpy.context.selected_objects[0]
+  # st()
+  if version_name.NEW_VERSION:
+    bpy.context.view_layer.objects.active = bpy.context.selected_objects[0]
+    bpy.context.view_layer.objects.active.name = new_name
+    bpy.context.view_layer.objects.active = bpy.data.objects[new_name]
+  else:
+    bpy.context.scene.objects.active =   bpy.context.selected_objects[0]
+    bpy.context.scene.objects.active.name = new_name
+    bpy.context.scene.objects.active = bpy.data.objects[new_name]
   #bpy.ops.object.join()
-  bpy.context.scene.objects.active.name = new_name
   print("Selected obj:", bpy.context.selected_objects[0])
   # bpy.data.objects[name].name = new_name
 
   # Set the new object as active, then rotate, scale, and translate it
   x, y = loc
-  bpy.context.scene.objects.active = bpy.data.objects[new_name]
   bpy.context.object.rotation_euler[2] = theta
   bpy.ops.transform.resize(value=(scale_x, scale_y, scale_z))
   bpy.ops.transform.translate(value=(x, y, scale_z+height_offset))

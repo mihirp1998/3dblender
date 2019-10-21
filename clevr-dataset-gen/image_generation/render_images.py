@@ -24,6 +24,8 @@ from mathutils import Matrix
 from math import radians
 import binvox_rw
 import ipdb
+import version_name
+
 st = ipdb.set_trace
 
 """
@@ -355,6 +357,8 @@ def main(args):
     Tree-based generation
 
 '''
+def kill():
+  import os; os._exit(1)
 
 def get_calibration_matrix_K_from_blender(camd):
     from mathutils import Matrix
@@ -490,6 +494,7 @@ def render_scene_with_tree(args,
                            depth_path=None,
                            ):
     # Load the main blendfile
+    st()
     bpy.ops.wm.open_mainfile(filepath=args.base_scene_blendfile)
 
     # Load materials
@@ -499,7 +504,10 @@ def render_scene_with_tree(args,
     # We use functionality specific to the CYCLES renderer so BLENDER_RENDER
     # cannot be used.
     render_args = bpy.context.scene.render
-    render_args.engine = "CYCLES"
+    if version_name.NEW_VERSION:
+        render_args.engine = 'BLENDER_EEVEE'
+    else:
+        render_args.engine = "CYCLES"
     # render_args.filepath = output_image
     render_args.resolution_x = args.width
     render_args.resolution_y = args.height
@@ -511,9 +519,16 @@ def render_scene_with_tree(args,
         if bpy.app.version < (2, 78, 0):
             bpy.context.user_preferences.system.compute_device_type = 'CUDA'
             bpy.context.user_preferences.system.compute_device = 'CUDA_0'
+            version_name.NEW_VERSION = False
+        elif bpy.app.version == (2, 80, 75):
+            cycles_prefs = bpy.context.preferences.addons['cycles'].preferences
+            cycles_prefs.compute_device_type = 'CUDA'
+            version_name.NEW_VERSION = True
         else:
             cycles_prefs = bpy.context.user_preferences.addons['cycles'].preferences
             cycles_prefs.compute_device_type = 'CUDA'
+            version_name.NEW_VERSION = False
+
 
     # Some CYCLES-specific stuff
     bpy.data.worlds['World'].cycles.sample_as_light = True
@@ -543,7 +558,11 @@ def render_scene_with_tree(args,
     }
 
     # Put a plane on the ground so we can compute cardinal directions
-    bpy.ops.mesh.primitive_plane_add(radius=args.scene_size)
+    if version_name.NEW_VERSION:
+        bpy.ops.mesh.primitive_plane_add(size=args.scene_size)
+    else:
+        bpy.ops.mesh.primitive_plane_add(radius=args.scene_size)
+
     plane = bpy.context.object
 
     # Figure out the left, up, and behind directions along the plane and record
@@ -556,9 +575,15 @@ def render_scene_with_tree(args,
 
     plane_normal = plane.data.vertices[0].normal
     print('The plane normal is: ', plane_normal)
-    cam_behind = camera.matrix_world.to_quaternion() * Vector((0, 0, -1))
-    cam_left = camera.matrix_world.to_quaternion() * Vector((-1, 0, 0))
-    cam_up = camera.matrix_world.to_quaternion() * Vector((0, 1, 0))
+    if version_name.NEW_VERSION:
+        cam_behind = camera.matrix_world.to_quaternion() @ Vector((0, 0, -1))
+        cam_left = camera.matrix_world.to_quaternion() @ Vector((-1, 0, 0))
+        cam_up = camera.matrix_world.to_quaternion() @ Vector((0, 1, 0))
+    else:    
+        cam_behind = camera.matrix_world.to_quaternion() * Vector((0, 0, -1))
+        cam_left = camera.matrix_world.to_quaternion() * Vector((-1, 0, 0))
+        cam_up = camera.matrix_world.to_quaternion() * Vector((0, 1, 0))
+    # st()
     plane_behind = (cam_behind - cam_behind.project(plane_normal)).normalized()
     plane_left = (cam_left - cam_left.project(plane_normal)).normalized()
     plane_up = cam_up.project(plane_normal).normalized()
@@ -732,10 +757,14 @@ def render_scene_with_tree(args,
     #     bpy.ops.wm.save_as_mainfile(filepath=output_blendfile)
 
     # Write a temp .obj file for binvox
+    # st()
     bpy.ops.object.select_all(action='DESELECT')
     for obj in bpy.data.objects:
         if (obj.type == 'MESH' and obj.name != 'Ground'):
-            obj.select = True
+            if version_name.NEW_VERSION:
+                obj.select_set(True)
+            else:
+                obj.select = True
 
     bpy.ops.export_scene.obj(
             filepath=output_blendfile,
@@ -795,6 +824,7 @@ def render_scene_with_tree(args,
                 objs.remove(obj, do_unlink=True)
 
     render_args.filepath = os.path.join(output_image, image_name + '_orig.png')
+    st()
     while True:
         try:
             bpy.ops.render.render(write_still=True)
@@ -946,6 +976,20 @@ def add_objects_from_given_trees(args, objects):
         rgba = color_name_to_rgba[color]
         utils.add_material(mat_name, Color=rgba)
 
+def render_image():
+    objpath = '//home/sirdome/shamit/3dblender/clevr-dataset-gen/image_generation/data/shapes/Tomato_material.obj'
+    bpy.ops.import_scene.obj(filepath='/home/mihir/Documents/projects/3dblender/clevr-dataset-gen/image_generation/data/shapes/Tomato_material.obj')
+    bpy.context.view_layer.objects.active = bpy.context.selected_objects[0]
+    bpy.context.view_layer.objects.active.name = 'Tomato_material'
+    name = "Tomato_material"
+    new_name = name + "_0"
+    bpy.data.objects[name].name = new_name
+    render_args = bpy.context.scene.render
+    render_args.filepath = "/home/mihir/Documents/out.png"
+    render_args.engine = "CYCLES"
+    bpy.ops.render.render(write_still=True)
+
+
 def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     """
     Add random objects to the current blender scene
@@ -1085,7 +1129,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
         # st()
         # Actually add the object to the scene
         #obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
-        obj_name = utils.add_object_from_obj_file(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
+        obj_name = utils.add_object_from_obj_file(args.shape_dir, obj_name, r, (x, y),  theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
         obj = bpy.context.object
         blender_objects.append(obj)
         positions.append((x, y, r))
@@ -1142,6 +1186,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
     # Check that all objects are at least partially visible in the rendered image
     all_visible = check_visibility(blender_objects, args.min_pixels_per_object)
+    all_visible = True
     if not all_visible and not put_obj_inside:
         # If any of the objects are fully occluded then start over; delete all
         # objects from the scene and place them all again.
@@ -1336,18 +1381,30 @@ def render_shadeless(blender_objects, path='flat.png'):
     # Cache the render args we are about to clobber
     old_filepath = render_args.filepath
     old_engine = render_args.engine
-    old_use_antialiasing = render_args.use_antialiasing
+    # old_use_antialiasing = render_args.use_antialiasing
 
     # Override some render settings to have flat shading
     render_args.filepath = path
-    render_args.engine = 'BLENDER_RENDER'
-    render_args.use_antialiasing = False
-
-    # Move the lights and ground to layer 2 so they don't render
-    utils.set_layer(bpy.data.objects['Lamp_Key'], 2)
-    utils.set_layer(bpy.data.objects['Lamp_Fill'], 2)
-    utils.set_layer(bpy.data.objects['Lamp_Back'], 2)
-    utils.set_layer(bpy.data.objects['Ground'], 2)
+    if version_name.NEW_VERSION:
+        render_args.engine = 'BLENDER_EEVEE'
+    else:
+        render_args.engine = 'BLENDER_RENDER'
+    # render_args.use_antialiasing = False
+    if version_name.NEW_VERSION:
+        # Move the lights and ground to layer 2 so they don't render
+        coll2 = bpy.data.collections.new("Collection 2")
+        coll1 = bpy.data.collections['Collection 1']
+        # bpy.context.scene.collection.children.link(coll2)
+        utils.set_layer_new(bpy.data.objects['Lamp_Key'], coll2,coll1)
+        utils.set_layer_new(bpy.data.objects['Lamp_Fill'], coll2,coll1)
+        utils.set_layer_new(bpy.data.objects['Lamp_Back'], coll2,coll1)
+        utils.set_layer_new(bpy.data.objects['Ground'], coll2,coll1)
+    else:
+        # Move the lights and ground to layer 2 so they don't render
+        utils.set_layer(bpy.data.objects['Lamp_Key'], 2)
+        utils.set_layer(bpy.data.objects['Lamp_Fill'], 2)
+        utils.set_layer(bpy.data.objects['Lamp_Back'], 2)
+        utils.set_layer(bpy.data.objects['Ground'], 2)
 
     # Add random shadeless materials to all objects
     object_colors = set()
@@ -1360,9 +1417,16 @@ def render_shadeless(blender_objects, path='flat.png'):
         while True:
             r, g, b = [random.random() for _ in range(3)]
             if (r, g, b) not in object_colors: break
-        object_colors.add((r, g, b))
-        mat.diffuse_color = [r, g, b]
-        mat.use_shadeless = True
+        if version_name.NEW_VERSION:
+            object_colors.add((r, g, b,1.0))
+            # mat.diffuse_color = [r, g, b,1.0]
+            mat.shadow_method = "NONE"
+            mat.use_nodes = False
+        else:
+            object_colors.add((r, g, b))
+            mat.diffuse_color = [r, g, b]            
+            mat.use_shadeless = True
+
         obj.data.materials[0] = mat
 
     # Render the scene
@@ -1372,16 +1436,23 @@ def render_shadeless(blender_objects, path='flat.png'):
     for mat, obj in zip(old_materials, blender_objects):
         obj.data.materials[0] = mat
 
-    # Move the lights and ground back to layer 0
-    utils.set_layer(bpy.data.objects['Lamp_Key'], 0)
-    utils.set_layer(bpy.data.objects['Lamp_Fill'], 0)
-    utils.set_layer(bpy.data.objects['Lamp_Back'], 0)
-    utils.set_layer(bpy.data.objects['Ground'], 0)
+    if version_name.NEW_VERSION:
+        # Move the lights and ground to layer 2 so they don't render
+        utils.set_layer_new(bpy.data.objects['Lamp_Key'], coll1,coll2)
+        utils.set_layer_new(bpy.data.objects['Lamp_Fill'], coll1,coll2)
+        utils.set_layer_new(bpy.data.objects['Lamp_Back'], coll1,coll2)
+        utils.set_layer_new(bpy.data.objects['Ground'], coll1,coll2)
+    else:
+        # Move the lights and ground back to layer 0
+        utils.set_layer(bpy.data.objects['Lamp_Key'], 0)
+        utils.set_layer(bpy.data.objects['Lamp_Fill'], 0)
+        utils.set_layer(bpy.data.objects['Lamp_Back'], 0)
+        utils.set_layer(bpy.data.objects['Ground'], 0)
 
     # Set the render settings back to what they were
     render_args.filepath = old_filepath
     render_args.engine = old_engine
-    render_args.use_antialiasing = old_use_antialiasing
+    # render_args.use_antialiasing = old_use_antialiasing
 
     return object_colors
 
