@@ -162,7 +162,7 @@ parser.add_argument('--output_blend_dir', default='../output/{}/voxels/',
                          "user requested that these files be saved using the " +
                          "--save_blendfiles flag; in this case it will be created if it does " +
                          "not already exist.")
-parser.add_argument('--save_depth_maps', type=int, default=0,
+parser.add_argument('--save_depth_maps', type=int, default=1,
                     help="The flag for whether to save a depth map")
 parser.add_argument('--save_blendfiles', type=int, default=1,
                     help="Setting --save_blendfiles 1 will cause the blender scene file for " +
@@ -502,7 +502,7 @@ def render_scene_with_tree(args,
                            depth_path=None,
                            ):
     # Load the main blendfile
-    #st()
+    # st()
     bpy.ops.wm.open_mainfile(filepath=args.base_scene_blendfile)
 
     # Load materials
@@ -800,6 +800,7 @@ def render_scene_with_tree(args,
     voxel_file = output_blendfile.split('.obj')[0] + '.schematic'
     command = 'python write_voxels.py {} {}'.format(voxel_file, str(args.width))
     os.system(command)
+    # st()
     # cmd = subprocess.Popen(["python", "write_voxels.py", voxel_file, str(args.width)], stdout=subprocess.PIPE, close_fds=True)
     # output = cmd.communicate(timeout=None)[0]
 
@@ -860,7 +861,9 @@ def render_scene_with_tree(args,
             print('*'*30)
 
     # Render depth maps if flag is on
+    #st()
     if args.save_depth_maps:
+        #st()
         depth_path = os.path.join(os.path.dirname(depth_path), image_name)
         blender_tree.links.new(blender_tree.nodes["Render Layers"].outputs["Depth"], blender_tree.nodes["Map Range"].inputs["Value"])
         blender_tree.links.new(blender_tree.nodes["Map Range"].outputs["Value"], blender_tree.nodes["Composite"].inputs["Image"])
