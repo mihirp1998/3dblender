@@ -1,17 +1,7 @@
 # Blender MTL File: 'None'
-# Material Count: 2
+# Material Count: 1
 
-newmtl sir
-Ns 9.803922
-Ka 0.000000 0.000000 0.000000
-Kd 1.000000 0.900000 0.500000
-Ks 0.200000 0.200000 0.200000
-Ke 0.000000 0.000000 0.000000
-Ni 1.000000
-d 0.900000
-illum 2
-
-newmtl sirk
+newmtl sir.001
 Ns 9.803922
 Ka 0.000000 0.000000 0.000000
 Kd 1.000000 0.900000 0.500000

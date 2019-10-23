@@ -218,7 +218,7 @@ parser.add_argument('--add_layout_prob', default=0.5, type=float,
 #TODO: correct this
 def isBlendFile(name):
 
-    if name in ['cube']:
+    if name in ['cube', 'sphere', 'cylinder']:
         return True
     return False
 

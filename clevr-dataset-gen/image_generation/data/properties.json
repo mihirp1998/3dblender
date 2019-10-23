@@ -1,12 +1,16 @@
 {
   "shapes": {
 
-    "tomato": "Tomato_material",
-    "jalapeno": "Jalapeno_origin",
-    "egg": "egg",
+    "tomato": "tomato",
+    "jalapeno": "Jalapeno",
     "chilli": "chilli",
     "cheese": "cheese",
-    "cube": "SmoothCube_v2"
+    "lettuce": "lettuce",
+    "cube": "SmoothCube_v2",
+    "cucumber": "cucumber",
+    "bell_pepper": "bell_pepper",
+    "sphere": "Sphere",
+    "cylinder": "SmoothCylinder"
   },
   "colors": {
     "gray": [87, 87, 87],

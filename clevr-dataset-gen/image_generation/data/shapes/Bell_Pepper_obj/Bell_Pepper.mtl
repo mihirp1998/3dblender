@@ -1,0 +1,73 @@
+# 3ds Max Wavefront OBJ Exporter v0.94b - (c)2007 guruware
+# File Created: 30.06.2016 12:22:39
+
+newmtl half
+	Ns 10.000
+	Ni 1.500
+	d 1.000
+	Tr 1.000
+	Tf 1.000 1.000 1.000 
+	illum 2
+	Ka 0.588 0.588 0.588
+	Kd 0.588 0.588 0.588
+	Ks 0.000 0.000 0.000
+	Ke 0.000 0.000 0.000
+	map_Ka diffuse.png
+	map_Kd diffuse.png
+
+newmtl yellow
+	Ns 10.000
+	Ni 1.500
+	d 1.000
+	Tr 1.000
+	Tf 1.000 1.000 1.000 
+	illum 2
+	Ka 1.000 0.918 0.012
+	Kd 1.000 0.918 0.012
+	Ks 0.000 0.000 0.000
+	Ke 0.000 0.000 0.000
+	map_Ka diffuse.png
+	map_Kd diffuse.png
+
+newmtl branch
+	Ns 56.000
+	Ni 1.500
+	d 1.000
+	Tr 1.000
+	Tf 1.000 1.000 1.000 
+	illum 2
+	Ka 0.588 0.588 0.588
+	Kd 0.500 0.500 0.500
+	Ks 0.000 0.000 0.000
+	Ke 0.000 0.000 0.000
+	map_Ka diffuse.png
+	map_Kd diffuse.png
+	map_Ks reflection.png
+
+newmtl red
+	Ns 10.000
+	Ni 1.500
+	d 1.000
+	Tr 1.000
+	Tf 1.000 1.000 1.000 
+	illum 2
+	Ka 1.000 0.176 0.012
+	Kd 1.000 0.176 0.012
+	Ks 0.000 0.000 0.000
+	Ke 0.000 0.000 0.000
+	map_Ka diffuse.png
+	map_Kd diffuse.png
+
+newmtl green
+	Ns 10.000
+	Ni 1.500
+	d 1.000
+	Tr 1.000
+	Tf 1.000 1.000 1.000 
+	illum 2
+	Ka 0.086 0.616 0.122
+	Kd 0.086 0.616 0.122
+	Ks 0.000 0.000 0.000
+	Ke 0.000 0.000 0.000
+	map_Ka diffuse.png
+	map_Kd diffuse.png

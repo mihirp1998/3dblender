@@ -1,0 +1,27 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+
+newmtl branch
+Ns 54.901961
+Ka 0.588000 0.588000 0.588000
+Kd 0.500000 0.500000 0.500000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Bell_Pepper_obj/diffuse.png
+map_Ka Bell_Pepper_obj/diffuse.png
+map_Ks Bell_Pepper_obj/reflection.png
+
+newmtl yellow
+Ns 9.803922
+Ka 0.643333 0.643333 0.643333
+Kd 1.000000 0.918000 0.012000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Bell_Pepper_obj/diffuse.png
+map_Ka Bell_Pepper_obj/diffuse.png
