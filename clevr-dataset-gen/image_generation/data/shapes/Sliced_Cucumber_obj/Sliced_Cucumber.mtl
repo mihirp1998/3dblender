@@ -1,0 +1,38 @@
+# 
+# Wavefront material file
+# Converted by the DEEP Exploration  Deep Exploration 6.5 x64 6.5.0.9182
+# Right Hemisphere, LTD
+# http://www.righthemisphere.com/
+# 
+
+newmtl cucumber_cut_mat
+Ka 0.0745098 0.192157 0.0470588
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 45.2548
+map_Kd cucumber_cut_dif.png
+map_bump cucumber_cut_bm.png
+bump cucumber_cut_bm.png
+map_opacity 
+map_d 
+refl 
+map_kS cucumber_cut_spec.png
+map_kA 
+map_Ns 
+
+newmtl cucumber_cut2_mat
+Ka 0.0745098 0.192157 0.0470588
+Kd 1 1 1
+Ks 1 1 1
+illum 2
+Ns 45.2548
+map_Kd cucumber_cut2_dif.png
+map_bump cucumber_cut2_bm.png
+bump cucumber_cut2_bm.png
+map_opacity 
+map_d 
+refl 
+map_kS cucumber_cut2_spec.png
+map_kA 
+map_Ns 

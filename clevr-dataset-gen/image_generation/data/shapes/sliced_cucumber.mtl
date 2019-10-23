@@ -1,0 +1,15 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl cucumber_cut_mat
+Ns 45.098039
+Ka 0.104575 0.104575 0.104575
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Sliced_Cucumber_obj/cucumber_cut_dif.png
+map_Bump Sliced_Cucumber_obj/cucumber_cut_bm.png
+map_Ks Sliced_Cucumber_obj/cucumber_cut_spec.png

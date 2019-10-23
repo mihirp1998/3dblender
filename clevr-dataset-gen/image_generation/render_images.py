@@ -7,6 +7,7 @@
 # of patent rights can be found in the PATENTS file in the same directory.
 
 from __future__ import print_function
+import ipdb
 import _init_paths
 import math, sys, random, argparse, json, os, tempfile, pickle
 
@@ -23,7 +24,7 @@ import time
 from mathutils import Matrix
 from math import radians
 import binvox_rw
-import ipdb
+
 import version_name
 
 st = ipdb.set_trace
@@ -65,8 +66,8 @@ if INSIDE_BLENDER:
 parser = argparse.ArgumentParser()
 
 # Input options
-parser.add_argument('--base_scene_blendfile', default='data/base_scene_full.blend',
-                    help="Base blender file on which all scenes are based; includes " +
+parser.add_argument('--base_scene_blendfile', default='/home/zhouxian/shamit/3dblender/clevr-dataset-gen/image_generation/data/base_scene_full.blend',
+                    help="WARNING: GIVEN FULL PATH. IT WORKS THIS WAY ONLY WHEN YOU LOAD OBJ FILES. Base blender file on which all scenes are based; includes " +
                          "ground plane, lights, and camera.")
 parser.add_argument('--properties_json', default='data/properties.json',
                     help="JSON file defining objects, materials, sizes, and colors. " +
@@ -498,7 +499,7 @@ def render_scene_with_tree(args,
     bpy.ops.wm.open_mainfile(filepath=args.base_scene_blendfile)
 
     # Load materials
-    utils.load_materials(args.material_dir)
+    #utils.load_materials(args.material_dir)
 
     # Set render arguments so we can get pixel coordinates later.
     # We use functionality specific to the CYCLES renderer so BLENDER_RENDER
@@ -778,10 +779,10 @@ def render_scene_with_tree(args,
         # cmd = subprocess.Popen(["./binvox", "-d", "64", "-t", "schematic", "-e", "-mb", output_blendfile], stdout=subprocess.PIPE, close_fds=True)
         # cmd = subprocess.Popen(["binvox", "-d", "64", "-t", "schematic", "-e", "-mb -bb -10 -10 -10 10 10 10", output_blendfile], stdout=None, close_fds=True)
         # output = cmd.communicate(timeout=None)[0]
-        command = './binvox -d 64 -e -bb {} {} {} {} {} {} -t schematic -e -mb {}'.format(-args.scene_size, -args.scene_size, -args.scene_size, args.scene_size, args.scene_size, args.scene_size, output_blendfile)
+        command = './binvox -d ' + str(args.height) + ' -e -bb {} {} {} {} {} {} -t schematic -e -mb {}'.format(-args.scene_size, -args.scene_size, -args.scene_size, args.scene_size, args.scene_size, args.scene_size, output_blendfile)
         os.system(command)
         
-        command = './binvox -d 64 -e -bb {} {} {} {} {} {} -t binvox -e -mb {}'.format(-args.scene_size, -args.scene_size, -args.scene_size, args.scene_size, args.scene_size, args.scene_size, output_blendfile)
+        command = './binvox -d ' + str(args.width) + ' -e -bb {} {} {} {} {} {} -t binvox -e -mb {}'.format(-args.scene_size, -args.scene_size, -args.scene_size, args.scene_size, args.scene_size, args.scene_size, output_blendfile)
         os.system(command)
 
     if os.path.exists(output_blendfile):
@@ -1251,8 +1252,14 @@ def get_bbox(args, camera, scene_struct, obj_loc, obj_type, r):
     elif obj_type == 'tomato':
         # Copied from sphere's 3d point calculation. Replace later
         points_3d = [obj_loc + r * vector for vector in get_sphere_unit_vectors(scene_struct['directions'])]
+    elif obj_type == 'egg':
+        # Copied from sphere's 3d point calculation. Replace later
+        points_3d = [obj_loc + r * vector for vector in get_sphere_unit_vectors(scene_struct['directions'])]
     else:
-        raise RuntimeError('invalid object type name')
+        # Copied from sphere's 3d point calculation. Replace later
+        points_3d = [obj_loc + r * vector for vector in get_sphere_unit_vectors(scene_struct['directions'])]
+    # else:
+    #     raise RuntimeError('invalid object type name')
 
     points_2d = [utils.get_camera_coords(camera, location) for location in points_3d]
     x_cords = [location[0] for location in points_2d]

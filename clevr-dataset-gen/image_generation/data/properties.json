@@ -1,7 +1,11 @@
 {
   "shapes": {
 
-    "tomato": "Tomato_material"
+    "tomato": "Tomato_material",
+    "jalapeno": "Jalapeno_origin",
+    "egg": "egg",
+    "chilli": "chilli",
+    "cheese": "cheese"
   },
   "colors": {
     "gray": [87, 87, 87],

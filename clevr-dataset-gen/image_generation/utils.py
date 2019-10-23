@@ -117,6 +117,9 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   if name == 'Cup':
     scale_x, scale_y, scale_z = 4.5, 4.5, 1.75
     height_offset = -1.5
+  # elif "jalapeno" in name.lower():
+  #   print("Check for scale_z and height offset")
+  #   height_offset = -0.5
   else:
     height_offset = 0.1
   if put_obj_inside:
@@ -135,8 +138,9 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
 
   # filename = os.path.join(object_dir, '%s.blend' % name, 'Object', name)
   # bpy.ops.wm.append(filename=filename)
-
+  
   filename = os.path.join(object_dir, '%s.obj' % name)
+  filename = '/home/zhouxian/shamit/3dblender/clevr-dataset-gen/image_generation/data/shapes/' + name + ".obj" 
 
   print("Filename from where object file will be loaded: ", filename)
 
@@ -151,18 +155,33 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
     bpy.context.view_layer.objects.active.name = new_name
     bpy.context.view_layer.objects.active = bpy.data.objects[new_name]
   else:
-    bpy.context.scene.objects.active =   bpy.context.selected_objects[0]
-    bpy.context.scene.objects.active.name = new_name
-    bpy.context.scene.objects.active = bpy.data.objects[new_name]
+    obj_objects = bpy.context.selected_objects[:]
+    curr_object = obj_objects[0]
+    curr_object.name = new_name
+    bpy.context.scene.objects.active =   curr_object
+  print("Check for dimensions here")
+  st()
+    # bpy.data.objects[name].name = new_name
+    # bpy.context.scene.objects.active = bpy.data.objects[new_name]
+
+    # pass
+    # bpy.context.scene.objects.active =   bpy.context.selected_objects[0]
+    #bpy.context.scene.objects.active.name = new_name
+    # bpy.context.scene.objects.active = bpy.data.objects[new_name]
   #bpy.ops.object.join()
-  print("Selected obj:", bpy.context.selected_objects[0])
+  # print("Selected obj:", bpy.context.selected_objects[0])
   # bpy.data.objects[name].name = new_name
 
   # Set the new object as active, then rotate, scale, and translate it
   x, y = loc
   bpy.context.object.rotation_euler[2] = theta
   bpy.ops.transform.resize(value=(scale_x, scale_y, scale_z))
-  bpy.ops.transform.translate(value=(x, y, scale_z+height_offset))
+  bpy.ops.transform.translate(value=(x, y, scale_z + height_offset))
+
+  obj = bpy.context.object
+  lowest_pt = min([(obj.matrix_world * v.co).z for v in obj.data.vertices])
+  obj.location.z -= lowest_pt
+  st()
   return new_name
 
 def kill():

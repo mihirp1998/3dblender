@@ -1,0 +1,19 @@
+# Max2Mtl Version 4.0 Mar 10th, 2001
+#
+newmtl sirk
+Ka  0.0 0.0 0.0
+Kd  1.0 0.9 0.5
+Ks  0.2 0.2 0.2
+d  0.9
+Ns  10.0
+illum 2
+#
+newmtl sir
+Ka  0.0 0.0 0.0
+Kd  1.0 0.9 0.5
+Ks  0.2 0.2 0.2
+d  0.9
+Ns  10.0
+illum 2
+#
+# EOF
