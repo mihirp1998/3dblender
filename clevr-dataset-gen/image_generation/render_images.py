@@ -215,6 +215,13 @@ parser.add_argument('--add_layout_prob', default=0.5, type=float,
                     help="probability of adding an extra layout layer")
 
 
+#TODO: correct this
+def isBlendFile(name):
+
+    if name in ['cube']:
+        return True
+    return False
+
 def main(args):
     num_digits = 6
     prefix = '%s_%s_' % (args.filename_prefix, args.split)
@@ -495,11 +502,12 @@ def render_scene_with_tree(args,
                            depth_path=None,
                            ):
     # Load the main blendfile
-    st()
+    #st()
     bpy.ops.wm.open_mainfile(filepath=args.base_scene_blendfile)
 
     # Load materials
-    #utils.load_materials(args.material_dir)
+    
+    utils.load_materials(args.material_dir)
 
     # Set render arguments so we can get pixel coordinates later.
     # We use functionality specific to the CYCLES renderer so BLENDER_RENDER
@@ -825,7 +833,7 @@ def render_scene_with_tree(args,
                 objs.remove(obj, do_unlink=True)
 
     render_args.filepath = os.path.join(output_image, image_name + '_orig.png')
-    st()
+    #st()
     while True:
         try:
             bpy.ops.render.render(write_still=True)
@@ -1129,24 +1137,28 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
         # st()
         # Actually add the object to the scene
-        #obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
-        obj_name = utils.add_object_from_obj_file(args.shape_dir, obj_name, r, (x, y),  theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
+        # print("Check for object name here (object_name)")
+        # st()
+        if isBlendFile(obj_name_out):
+            obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
+            # Attach a random material
+            mat_name_out = specified_obj.attributes['material'].attr_val
+            #material names and then pick randomly from them.
+            mat_name = material_mapping[mat_name_out]
+            # mat_name, mat_name_out = random.choice(material_mapping)
+            print(mat_name, mat_name_out)            
+            utils.add_material(mat_name, Color=rgba)
+
+        else:
+
+            obj_name = utils.add_object_from_obj_file(args.shape_dir, obj_name, r, (x, y),  theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
+            mat_name_out = "dummy_mat" #TODO: probably set to actual material?
+
         obj = bpy.context.object
         blender_objects.append(obj)
         positions.append((x, y, r))
 
-        # Attach a random material
-        #mat_name_out = specified_obj.attributes['material'].attr_val
-        #TODO: right now hardcoding material name for tomato. Change this so that each vegitable can have multiple 
-        #material names and then pick randomly from them.
-        # mat_name = material_mapping[mat_name_out]
-        mat_name = "tomato_one"
-        mat_name_out = mat_name
-        # mat_name, mat_name_out = random.choice(material_mapping)
-
-        print(mat_name, mat_name_out)
         
-        #utils.add_material(mat_name, Color=rgba)
 
         # Assign block id to material for binvox to work its magic
         object_id = specified_obj.get_block_id()
@@ -1187,7 +1199,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
     # Check that all objects are at least partially visible in the rendered image
     all_visible = check_visibility(blender_objects, args.min_pixels_per_object)
-    all_visible = True
+    all_visible = True #TODO: remove this
     if not all_visible and not put_obj_inside:
         # If any of the objects are fully occluded then start over; delete all
         # objects from the scene and place them all again.
@@ -1201,23 +1213,23 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     #     myfile.write(size_name + '\n')
 
     # In case of 1 object, add extra objects to center the first object. Later make the new ones invisible in voxels
-    # if len(specified_objects) == 1:
-    #     x_extra, y_extra, r_extra = positions[0]
-    #     r_extra = 0.2
-    #     theta_extra = 0
-    #     rand_id = np.random.randint(1,255)
-    #     while rand_id == object_id:
-    #         rand_id = np.random.randint(1,255)
+    if len(specified_objects) == 1:
+        x_extra, y_extra, r_extra = positions[0]
+        r_extra = 0.2
+        theta_extra = 0
+        rand_id = np.random.randint(1,255)
+        while rand_id == object_id:
+            rand_id = np.random.randint(1,255)
 
-    #     offset_extra = np.random.uniform(2,4)
-    #     obj_name_1 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra + offset_extra, y_extra + offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
-    #     utils.add_material(mat_name, Color=rgba)
-    #     bpy.data.objects[obj_name_1].active_material.name = 'blockid_' + str(rand_id)
+        offset_extra = np.random.uniform(2,4)
+        obj_name_1 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra + offset_extra, y_extra + offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
+        utils.add_material(mat_name, Color=rgba)
+        bpy.data.objects[obj_name_1].active_material.name = 'blockid_' + str(rand_id)
 
-    #     offset_extra = np.random.uniform(2,4)
-    #     obj_name_2 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra - offset_extra, y_extra - offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
-    #     utils.add_material(mat_name, Color=rgba)
-    #     bpy.data.objects[obj_name_2].active_material.name = 'blockid_' + str(rand_id)
+        offset_extra = np.random.uniform(2,4)
+        obj_name_2 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra - offset_extra, y_extra - offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
+        utils.add_material(mat_name, Color=rgba)
+        bpy.data.objects[obj_name_2].active_material.name = 'blockid_' + str(rand_id)
 
     return objects, blender_objects, tree
 
@@ -1388,7 +1400,7 @@ def render_shadeless(blender_objects, path='flat.png'):
     # Cache the render args we are about to clobber
     old_filepath = render_args.filepath
     old_engine = render_args.engine
-    # old_use_antialiasing = render_args.use_antialiasing
+    old_use_antialiasing = render_args.use_antialiasing
 
     # Override some render settings to have flat shading
     render_args.filepath = path
@@ -1408,6 +1420,9 @@ def render_shadeless(blender_objects, path='flat.png'):
         utils.set_layer_new(bpy.data.objects['Ground'], coll2,coll1)
     else:
         # Move the lights and ground to layer 2 so they don't render
+        render_args.engine = 'BLENDER_RENDER'
+        render_args.use_antialiasing = False
+
         utils.set_layer(bpy.data.objects['Lamp_Key'], 2)
         utils.set_layer(bpy.data.objects['Lamp_Fill'], 2)
         utils.set_layer(bpy.data.objects['Lamp_Back'], 2)
@@ -1431,8 +1446,9 @@ def render_shadeless(blender_objects, path='flat.png'):
             mat.use_nodes = False
         else:
             object_colors.add((r, g, b))
-            mat.diffuse_color = [r, g, b]            
-            mat.use_shadeless = True
+            if isBlendFile(obj.name):
+                mat.diffuse_color = [r, g, b]            
+                mat.use_shadeless = True
 
         obj.data.materials[0] = mat
 
@@ -1459,7 +1475,7 @@ def render_shadeless(blender_objects, path='flat.png'):
     # Set the render settings back to what they were
     render_args.filepath = old_filepath
     render_args.engine = old_engine
-    # render_args.use_antialiasing = old_use_antialiasing
+    render_args.use_antialiasing = old_use_antialiasing
 
     return object_colors
 

@@ -122,3 +122,19 @@ import os
 # st()
 bpy.ops.render.render(write_still=True)
 print("hello")
+
+
+'''
+import bpy
+bpy.ops.wm.open_mainfile(filepath="/home/zhouxian/shamit/3dblender/clevr-dataset-gen/image_generation/data/base_scene_full.blend")
+bpy.ops.wm.append(filename="/home/zhouxian/shamit/3dblender/clevr-dataset-gen/image_generation/data/shapes/SmoothCube_v2.blend/Object/SmoothCube_v2")
+render_args = bpy.context.scene.render
+render_args.engine = "CYCLES"
+filename = "/home/zhouxian/Documents/out.png"
+render_args.filepath = filename
+import os
+#os.remove(filename)
+# st()
+bpy.ops.render.render(write_still=True)
+print("hello")
+'''

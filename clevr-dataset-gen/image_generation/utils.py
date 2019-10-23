@@ -159,8 +159,8 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
     curr_object = obj_objects[0]
     curr_object.name = new_name
     bpy.context.scene.objects.active =   curr_object
-  print("Check for dimensions here")
-  st()
+  # print("Check for dimensions here")
+  # st()
     # bpy.data.objects[name].name = new_name
     # bpy.context.scene.objects.active = bpy.data.objects[new_name]
 
@@ -181,7 +181,7 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   obj = bpy.context.object
   lowest_pt = min([(obj.matrix_world * v.co).z for v in obj.data.vertices])
   obj.location.z -= lowest_pt
-  st()
+  #st()
   return new_name
 
 def kill():

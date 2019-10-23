@@ -5,7 +5,8 @@
     "jalapeno": "Jalapeno_origin",
     "egg": "egg",
     "chilli": "chilli",
-    "cheese": "cheese"
+    "cheese": "cheese",
+    "cube": "SmoothCube_v2"
   },
   "colors": {
     "gray": [87, 87, 87],
