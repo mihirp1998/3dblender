@@ -6,6 +6,7 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
+# blender --background --python render_images.py -- --num_images 1000 --use_gpu 1 --height 128 --width 128
 from __future__ import print_function
 import ipdb
 import _init_paths
@@ -66,7 +67,7 @@ if INSIDE_BLENDER:
 parser = argparse.ArgumentParser()
 
 # Input options
-parser.add_argument('--base_scene_blendfile', default='/home/zhouxian/shamit/3dblender/clevr-dataset-gen/image_generation/data/base_scene_full.blend',
+parser.add_argument('--base_scene_blendfile', default='./data/base_scene_full.blend',
                     help="WARNING: GIVEN FULL PATH. IT WORKS THIS WAY ONLY WHEN YOU LOAD OBJ FILES. Base blender file on which all scenes are based; includes " +
                          "ground plane, lights, and camera.")
 parser.add_argument('--properties_json', default='data/properties.json',
@@ -815,9 +816,9 @@ def render_scene_with_tree(args,
     # Ricson's code needs an offset of 90 for the thetas/phis to align.
     offset = 90
     if args.all_views:
-        THETAS = list(range(0+offset, 360+offset, 30))
+        THETAS = list(range(0+offset, 360+offset, 45))
         PHIS = list(range(20, 80, 20))
-        PHIS.insert(0, 12)
+        # PHIS.insert(0, 12)
     else:
         THETAS = list(range(0+offset, 360+offset, 90))
         PHIS = [40]
