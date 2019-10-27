@@ -214,6 +214,7 @@ parser.add_argument('--zero_shot', default=0, type=int,
                     help="Whether to use zero-shot setting when generate the data")
 parser.add_argument('--add_layout_prob', default=0.5, type=float,
                     help="probability of adding an extra layout layer")
+parser.add_argument("--render_empty_scene", default=False, type=int, help="Generates scenes with no objects present")
 
 
 #TODO: correct this
@@ -594,6 +595,7 @@ def render_scene_with_tree(args,
         cam_left = camera.matrix_world.to_quaternion() * Vector((-1, 0, 0))
         cam_up = camera.matrix_world.to_quaternion() * Vector((0, 1, 0))
     # st()
+    st()
     plane_behind = (cam_behind - cam_behind.project(plane_normal)).normalized()
     plane_left = (cam_left - cam_left.project(plane_normal)).normalized()
     plane_up = cam_up.project(plane_normal).normalized()
@@ -610,6 +612,73 @@ def render_scene_with_tree(args,
     scene_struct['directions']['right'] = tuple(-plane_left)
     scene_struct['directions']['above'] = tuple(plane_up)
     scene_struct['directions']['below'] = tuple(-plane_up)
+
+    if args.render_empty_scene:
+        offset = 90
+        if args.all_views:
+            THETAS = list(range(0+offset, 360+offset, 45))
+            PHIS = list(range(20, 80, 20))
+            # PHIS.insert(0, 12)
+        else:
+            THETAS = list(range(0+offset, 360+offset, 90))
+            PHIS = [40]
+
+        image_name = os.path.basename(output_image).split('.png')[0]
+        output_image = os.path.join(os.path.dirname(output_image), image_name)
+
+        
+        render_args.filepath = os.path.join(output_image, image_name + '_orig.png')
+        #st()
+        while True:
+            try:
+                bpy.ops.render.render(write_still=True)
+                break
+            except Exception as e:
+                print(e)
+
+        for theta in THETAS:
+            for phi in PHIS:
+                start = time.time()
+                camera.location = obj_centered_camera_pos(args.radius, theta, phi)
+                render_args.filepath = os.path.join(output_image, image_name + '_' + str(theta - offset) + '_' + str(phi) + '.png')
+                while True:
+                    try:
+                        bpy.ops.render.render(write_still=True)
+                        break
+                    except Exception as e:
+                        print(e)
+                view_key = str(theta - offset) + '_' + str(phi)
+                scene_struct = get_2d_bboxes(args, camera, scene_struct, view_key)
+                print('*'*30)
+                print('images')
+                print(time.time() - start)
+                print('*'*30)
+
+        # Render depth maps if flag is on
+        #st()
+        if args.save_depth_maps:
+            #st()
+            depth_path = os.path.join(os.path.dirname(depth_path), image_name)
+            blender_tree.links.new(blender_tree.nodes["Render Layers"].outputs["Depth"], blender_tree.nodes["Map Range"].inputs["Value"])
+            blender_tree.links.new(blender_tree.nodes["Map Range"].outputs["Value"], blender_tree.nodes["Composite"].inputs["Image"])
+            bpy.context.scene.render.image_settings.file_format = 'OPEN_EXR'
+            for theta in THETAS:
+                for phi in PHIS:
+                    start = time.time()
+                    camera.location = obj_centered_camera_pos(args.radius, theta, phi)
+                    bpy.data.scenes['Scene'].render.filepath = os.path.join(depth_path, image_name + '_' + str(theta - offset) + '_' + str(phi))
+                    while True:
+                        try:
+                            bpy.ops.render.render(write_still=True)
+                            break
+                        except Exception as e:
+                            print(e)
+                    print('*'*30)
+                    print('depth')
+                    print(time.time() - start)
+                    print('*'*30)
+        return
+
 
     if args.render_from_given_objects:
         # Read the specified objects json and render the given objects
