@@ -1,14 +1,6 @@
 {
   "shapes": {
-
-    "tomato": "tomato",
-    "jalapeno": "Jalapeno",
-    "chilli": "chilli",
-    "cheese": "cheese",
-    "lettuce": "lettuce",
     "cube": "SmoothCube_v2",
-    "cucumber": "cucumber",
-    "bell_pepper": "bell_pepper",
     "sphere": "Sphere",
     "cylinder": "SmoothCylinder"
   },

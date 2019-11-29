@@ -87,7 +87,7 @@ parser.add_argument('--shape_color_combos_json', default=None,
                          "for CLEVR-CoGenT.")
 
 # Settings for objects
-parser.add_argument('--min_objects', default=1, type=int,
+parser.add_argument('--min_objects', default=2, type=int,
                     help="The minimum number of objects to place in each scene")
 parser.add_argument('--max_objects', default=3, type=int,
                     help="The maximum number of objects to place in each scene")
@@ -595,7 +595,6 @@ def render_scene_with_tree(args,
         cam_left = camera.matrix_world.to_quaternion() * Vector((-1, 0, 0))
         cam_up = camera.matrix_world.to_quaternion() * Vector((0, 1, 0))
     # st()
-    st()
     plane_behind = (cam_behind - cam_behind.project(plane_normal)).normalized()
     plane_left = (cam_left - cam_left.project(plane_normal)).normalized()
     plane_up = cam_up.project(plane_normal).normalized()
