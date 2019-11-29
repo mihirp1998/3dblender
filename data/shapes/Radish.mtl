@@ -1,0 +1,28 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+
+newmtl Radish_K
+Ns 23.529412
+Ka 0.000000 0.000000 0.000000
+Kd 0.666700 0.023500 0.251000
+Ks 0.243000 0.243000 0.243000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Ramp.jpg
+map_Ka Ramp.jpg
+
+newmtl Radish_leaf
+Ns 23.529412
+Ka 0.000000 0.000000 0.000000
+Kd 0.364700 0.502000 0.211800
+Ks 0.306000 0.306000 0.306000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd radish_leaf_diff.jpg
+map_Bump Bump.jpg
+map_Ka radish_leaf_diff.jpg
+map_d radish_leaf_opas.jpg

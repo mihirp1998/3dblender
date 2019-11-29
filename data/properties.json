@@ -10,7 +10,18 @@
     "cucumber": "cucumber",
     "bell_pepper": "bell_pepper",
     "sphere": "Sphere",
-    "cylinder": "SmoothCylinder"
+    "cylinder": "SmoothCylinder",
+    "Broccoli": "Broccoli",
+    "cabbage": "cabbage",
+    "Carrot": "Carrot",
+    "Eggplant": "Eggplant",
+    "Garlic": "Garlic",
+    "Onion_green": "Onion_green",
+    "Parsley": "Parsley",
+    "Onion": "Onion",
+    "Potato": "Potato",
+    "Radish": "Radish"
+
   },
   "colors": {
     "gray": [87, 87, 87],

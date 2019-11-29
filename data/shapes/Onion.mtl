@@ -1,0 +1,14 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Onion
+Ns 15.686275
+Ka 0.000000 0.000000 0.000000
+Kd 0.854900 0.631400 0.411800
+Ks 0.443900 0.392000 0.342000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Onion_diff.jpg
+map_Ka Onion_diff.jpg

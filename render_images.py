@@ -6,7 +6,11 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
-# blender --background --python render_images.py -- --num_images 1000 --use_gpu 1 --height 128 --width 128
+'''
+1. command to generate single large obj dataset:
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_LARGE_OBJ_256_A --max_objects 1 --single_center_object 1
+'''
+# blender --background --python render_images.py -- --num_images 1000 --use_gpu 1 --height 128 --width 128 --dataset_name CLEVR_TEST
 from __future__ import print_function
 import ipdb
 import _init_paths
@@ -215,8 +219,8 @@ parser.add_argument('--zero_shot', default=0, type=int,
 parser.add_argument('--add_layout_prob', default=0.5, type=float,
                     help="probability of adding an extra layout layer")
 parser.add_argument("--render_empty_scene", default=False, type=int, help="Generates scenes with no objects present")
-
-
+parser.add_argument("--dynamic_lighting", default=True, type=int, help="Dynamically changes light intensity for each scene")
+parser.add_argument("--single_center_object", default=False, type=int, help="Renders a single object at the center of the scene")
 #TODO: correct this
 def isBlendFile(name):
 
@@ -225,6 +229,11 @@ def isBlendFile(name):
     return False
 
 def main(args):
+    # st()
+    if args.single_center_object:
+        assert args.min_objects == 1, "min number of objects should be 1 when single_center_object is True"
+        assert args.max_objects == 1, "max number of objects should be 1 when single_center_object is True"
+    
     num_digits = 6
     prefix = '%s_%s_' % (args.filename_prefix, args.split)
     img_template = '%s%%0%dd.png' % (prefix, num_digits)
@@ -310,6 +319,7 @@ def main(args):
 
         while True:
             try:
+                # st()
                 render_scene_with_tree(args,
                                        tree_max_level=3,
                                        output_index=(i + start_idx),
@@ -595,7 +605,7 @@ def render_scene_with_tree(args,
         cam_left = camera.matrix_world.to_quaternion() * Vector((-1, 0, 0))
         cam_up = camera.matrix_world.to_quaternion() * Vector((0, 1, 0))
     # st()
-    st()
+    # st()
     plane_behind = (cam_behind - cam_behind.project(plane_normal)).normalized()
     plane_left = (cam_left - cam_left.project(plane_normal)).normalized()
     plane_up = cam_up.project(plane_normal).normalized()
@@ -678,6 +688,16 @@ def render_scene_with_tree(args,
                     print(time.time() - start)
                     print('*'*30)
         return
+
+
+    
+    ## Now we will vary the light intensity
+    if args.dynamic_lighting:
+        #1. get all lamps
+        lamps = bpy.data.lamps
+        for lamp in lamps:
+            intensity = lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value
+            lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/7., intensity*5.)
 
 
     if args.render_from_given_objects:
@@ -1144,7 +1164,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
                     utils.delete_object(obj)
                 print(obj_counter)
                 return add_objects_from_tree(scene_struct, args, camera, tree_max_level)
-
+            # st()
             x = specified_obj.position[0] * scene_struct['directions']['right'][0] + specified_obj.position[1] * \
                 scene_struct['directions'][
                     'front'][0]
@@ -1152,6 +1172,23 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
                 scene_struct['directions'][
                     'front'][1]
 
+            if args.single_center_object:
+                # st()
+                r = 1.75
+                specified_obj.attributes['size']=Combine('size','xlarge')
+                if specified_obj.object_type in ["Carrot", "Onion_green", "Parsley"]:
+                    # These objects are long. Keep scale = 1 for them.
+                    specified_obj.attributes['size']=Combine('size','large')
+                    r = 1
+
+
+                specified_obj.position = (0,0)
+                x = 0
+                y = 0
+                # r = 2
+                # x = 1
+                # y = -1
+                #
             # Check to make sure the new object is further than min_dist from all
             # other objects, and further than margin along the four cardinal directions
             dists_good = True
@@ -1238,6 +1275,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
         bpy.data.objects[obj_name].active_material.name = 'blockid_' + str(object_id)
 
         # Record data about the object in the scene data structure
+        # st()
         pixel_coords_lefttop, pixel_coords_rightbottom = get_bbox(args, camera, scene_struct, obj.location, obj_name_out, r)
 
         # guarantee that objects are all in the image
@@ -1286,7 +1324,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
     #     myfile.write(size_name + '\n')
 
     # In case of 1 object, add extra objects to center the first object. Later make the new ones invisible in voxels
-    if len(specified_objects) == 1:
+    if not args.single_center_object and len(specified_objects) == 1:
         x_extra, y_extra, r_extra = positions[0]
         r_extra = 0.2
         theta_extra = 0

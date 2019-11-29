@@ -1,0 +1,15 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Carrot
+Ns 11.764706
+Ka 0.000000 0.000000 0.000000
+Kd 0.905900 0.537300 0.211800
+Ks 0.432000 0.432000 0.432000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Carrot.jpg
+map_Bump Carrot_bump.jpg
+map_Ka Carrot.jpg

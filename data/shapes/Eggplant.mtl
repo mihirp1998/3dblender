@@ -1,0 +1,28 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+
+newmtl Eggplant_F
+Ns 43.137255
+Ka 0.000000 0.000000 0.000000
+Kd 0.172500 0.105900 0.137300
+Ks 0.648000 0.648000 0.648000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Eggplant_F_diff.jpg
+map_Bump Eggplant_F_bump.jpg
+map_Ka Eggplant_F_diff.jpg
+
+newmtl Eggplant_H
+Ns 29.411765
+Ka 0.000000 0.000000 0.000000
+Kd 0.309800 0.572500 0.196100
+Ks 0.504000 0.504000 0.504000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Eggplant_H_diff.jpg
+map_Bump Eggplant_H_bump.jpg
+map_Ka Eggplant_H_diff.jpg

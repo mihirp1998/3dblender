@@ -1,0 +1,15 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl Garlic
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.870600 0.847100 0.788200
+Ks 0.243800 0.237200 0.220700
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Garlic_diff.jpg
+map_Ka Garlic_diff.jpg
+map_Ks Garlic_diff.jpg

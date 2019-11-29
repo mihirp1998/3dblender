@@ -1,0 +1,14 @@
+# Blender MTL File: 'None'
+# Material Count: 1
+
+newmtl cabbage
+Ns 19.607843
+Ka 0.000000 0.000000 0.000000
+Kd 0.721600 0.819600 0.662700
+Ks 0.234000 0.234000 0.234000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd cabbage_diff.jpg
+map_Ka cabbage_diff.jpg
