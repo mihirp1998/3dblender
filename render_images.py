@@ -1238,7 +1238,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             # r /= math.sqrt(2)
             theta = 45
         else:
-            theta = 0
+            theta = np.random.uniform(-180, 180)
 
         # If inside configuration exists in the sample, store the location for the next object
         # This is used to put the object at the same location, but inside the current object
