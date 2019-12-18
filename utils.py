@@ -10,7 +10,7 @@ import bpy, bpy_extras
 import ipdb
 st = ipdb.set_trace
 import version_name
-
+import numpy as np
 """
 Some utility functions for interacting with Blender
 """
@@ -90,7 +90,7 @@ def set_layer_new(obj, collection,old_collection):
 
 
 
-def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5):
+def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5, args=None):
   """
   Load an object from an obj file. We assume that in the directory object_dir, there
   is a file named "$name.obj" which contains a single object named "$name"
@@ -159,6 +159,7 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
     curr_object = obj_objects[0]
     curr_object.name = new_name
     bpy.context.scene.objects.active =   curr_object
+
   # print("Check for dimensions here")
   # st()
     # bpy.data.objects[name].name = new_name
@@ -177,6 +178,18 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   bpy.context.object.rotation_euler[2] = theta
   bpy.ops.transform.resize(value=(scale_x, scale_y, scale_z))
   bpy.ops.transform.translate(value=(x, y, scale_z + height_offset))
+  # st()
+  # for o in bpy.context.object:
+  
+  # bpy.context.selected_objects[0].active_material.diffuse_color
+  if args.do_random_shear:
+    shear_val = np.random.uniform(-1, 1)
+    # shear_val = 1.0
+    bpy.ops.object.mode_set(mode = 'EDIT')
+    bpy.ops.transform.shear(value=shear_val)
+    # bpy.context.object.active_material.diffuse_color = (0,0,0)
+    bpy.ops.object.mode_set(mode='OBJECT')
+  # bpy.ops.transform.transform(mode='SHEAR', value=(100,100,100,100))
 
   obj = bpy.context.object
   lowest_pt = min([(obj.matrix_world * v.co).z for v in obj.data.vertices])
@@ -187,7 +200,7 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
 def kill():
   import os; os._exit(1)
 
-def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5):
+def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_obj_inside=False, allow_floating=0, percentage_floating_objects=0.5, args=None):
   """
   Load an object from a file. We assume that in the directory object_dir, there
   is a file named "$name.blend" which contains a single object named "$name"
@@ -242,6 +255,12 @@ def add_object(object_dir, name, scale, loc, theta=0, stored_location=None, put_
   bpy.context.object.rotation_euler[2] = theta
   bpy.ops.transform.resize(value=(scale_x, scale_y, scale_z))
   bpy.ops.transform.translate(value=(x, y, scale_z+height_offset))
+  if args.do_random_shear:
+    # st()
+    shear_val = np.random.uniform(-1, 1)
+    bpy.ops.object.mode_set(mode = 'EDIT')
+    bpy.ops.transform.shear(value=shear_val)
+    bpy.ops.object.mode_set(mode='OBJECT')
   return new_name
 
 def add_given_object(args, name, scale, loc, theta=0):

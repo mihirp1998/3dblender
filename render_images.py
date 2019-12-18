@@ -220,7 +220,10 @@ parser.add_argument('--add_layout_prob', default=0.5, type=float,
                     help="probability of adding an extra layout layer")
 parser.add_argument("--render_empty_scene", default=False, type=int, help="Generates scenes with no objects present")
 parser.add_argument("--dynamic_lighting", default=True, type=int, help="Dynamically changes light intensity for each scene")
-parser.add_argument("--single_center_object", default=False, type=int, help="Renders a single object at the center of the scene")
+parser.add_argument("--single_center_object", default=True, type=int, help="Renders a single object at the center of the scene")
+parser.add_argument("--do_random_rotation", default=False, type=int, help="Randomly rotate the object")
+parser.add_argument("--do_random_shear", default=True, type=int, help="Randomly shear the object")
+parser.add_argument("--do_random_scale", default=True, type=int, help="Randomly scale the object for single object case")
 #TODO: correct this
 def isBlendFile(name):
 
@@ -1175,11 +1178,16 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             if args.single_center_object:
                 # st()
                 r = 1.75
+                # st()
+                if args.do_random_scale:
+                    r = np.random.uniform(0.75, 1.75)
                 specified_obj.attributes['size']=Combine('size','xlarge')
                 if specified_obj.object_type in ["Carrot", "Onion_green", "Parsley"]:
                     # These objects are long. Keep scale = 1 for them.
                     specified_obj.attributes['size']=Combine('size','large')
                     r = 1
+                    if args.do_random_scale:
+                        r = np.random.uniform(0.75, 1)
 
 
                 specified_obj.position = (0,0)
@@ -1238,7 +1246,10 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             # r /= math.sqrt(2)
             theta = 45
         else:
-            theta = np.random.uniform(-180, 180)
+            if args.do_random_rotation:
+                theta = np.random.uniform(-180, 180)
+            else:
+                theta = 0
 
         # If inside configuration exists in the sample, store the location for the next object
         # This is used to put the object at the same location, but inside the current object
@@ -1250,7 +1261,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
         # print("Check for object name here (object_name)")
         # st()
         if isBlendFile(obj_name_out):
-            obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
+            obj_name = utils.add_object(args.shape_dir, obj_name, r, (x, y), theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects, args=args)
             # Attach a random material
             mat_name_out = specified_obj.attributes['material'].attr_val
             #material names and then pick randomly from them.
@@ -1261,7 +1272,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
         else:
 
-            obj_name = utils.add_object_from_obj_file(args.shape_dir, obj_name, r, (x, y),  theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects)
+            obj_name = utils.add_object_from_obj_file(args.shape_dir, obj_name, r, (x, y),  theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects, args=args)
             mat_name_out = "dummy_mat" #TODO: probably set to actual material?
 
         obj = bpy.context.object
@@ -1333,12 +1344,12 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             rand_id = np.random.randint(1,255)
 
         offset_extra = np.random.uniform(2,4)
-        obj_name_1 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra + offset_extra, y_extra + offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
+        obj_name_1 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra + offset_extra, y_extra + offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside, args=args)
         utils.add_material(mat_name, Color=rgba)
         bpy.data.objects[obj_name_1].active_material.name = 'blockid_' + str(rand_id)
 
         offset_extra = np.random.uniform(2,4)
-        obj_name_2 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra - offset_extra, y_extra - offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside)
+        obj_name_2 = utils.add_object(args.shape_dir, 'Sphere', r_extra, (x_extra - offset_extra, y_extra - offset_extra), theta=theta_extra, put_obj_inside=put_obj_inside, args=args)
         utils.add_material(mat_name, Color=rgba)
         bpy.data.objects[obj_name_2].active_material.name = 'blockid_' + str(rand_id)
 
