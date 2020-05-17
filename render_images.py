@@ -9,6 +9,8 @@
 '''
 1. command to generate single large obj dataset:
 blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_LARGE_OBJ_256_A --max_objects 1 --single_center_object 1
+2. command to generate single object day scenes with jitter in position
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_DAY_OBJ_256_A --max_objects 1 --min_objects 1 --dynamic_lighting 1 --random_position_jitter 2 --generate_day_scene 1
 '''
 # blender --background --python render_images.py -- --num_images 1000 --use_gpu 1 --height 128 --width 128 --dataset_name CLEVR_TEST
 from __future__ import print_function
@@ -220,10 +222,13 @@ parser.add_argument('--add_layout_prob', default=0.5, type=float,
                     help="probability of adding an extra layout layer")
 parser.add_argument("--render_empty_scene", default=False, type=int, help="Generates scenes with no objects present")
 parser.add_argument("--dynamic_lighting", default=True, type=int, help="Dynamically changes light intensity for each scene")
-parser.add_argument("--single_center_object", default=True, type=int, help="Renders a single object at the center of the scene")
+parser.add_argument("--single_center_object", default=False, type=int, help="Renders a single object at the center of the scene")
 parser.add_argument("--do_random_rotation", default=False, type=int, help="Randomly rotate the object")
-parser.add_argument("--do_random_shear", default=True, type=int, help="Randomly shear the object")
-parser.add_argument("--do_random_scale", default=True, type=int, help="Randomly scale the object for single object case")
+parser.add_argument("--do_random_shear", default=False, type=int, help="Randomly shear the object")
+parser.add_argument("--do_random_scale", default=False, type=int, help="Randomly scale the object for single object case")
+parser.add_argument("--generate_day_scene", default=False, type=int, help="Scene will be brightly illuminated")
+parser.add_argument("--generate_night_scene", default=False, type=int, help="Scene will be dark")
+parser.add_argument("--random_position_jitter", default=0, type=int, help="Random jitter added to object position")
 #TODO: correct this
 def isBlendFile(name):
 
@@ -700,7 +705,12 @@ def render_scene_with_tree(args,
         lamps = bpy.data.lamps
         for lamp in lamps:
             intensity = lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value
-            lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/7., intensity*5.)
+            if not args.generate_day_scene and not args.generate_night_scene:
+                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/7., intensity*5.)
+            elif args.generate_day_scene:
+                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity*3., intensity*5.)
+            elif args.generate_night_scene:
+                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/9., intensity/7.)
 
 
     if args.render_from_given_objects:
@@ -1174,6 +1184,9 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
             y = specified_obj.position[0] * scene_struct['directions']['right'][1] + specified_obj.position[1] * \
                 scene_struct['directions'][
                     'front'][1]
+            
+            x += random.uniform(-args.random_position_jitter,args.random_position_jitter)
+            y += random.uniform(-args.random_position_jitter,args.random_position_jitter)
 
             if args.single_center_object:
                 # st()

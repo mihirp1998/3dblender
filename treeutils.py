@@ -34,8 +34,8 @@ module_dict_all = dict()
 # objects list
 module_dict_split1['describe'] = ['cube']
 module_dict_split2['describe'] = ['cylinder', 'sphere']
-module_dict_all['describe'] = ["cube", "cheese", "tomato", "jalapeno", "chilli", "lettuce", "cucumber", "bell_pepper", "sphere", "cylinder", "Broccoli", "cabbage", "Carrot", "Eggplant", "Garlic", "Onion_green", "Parsley", "Onion", "Potato", "Radish"]
-# module_dict_all['describe'] = ["tomato"]
+# module_dict_all['describe'] = ["cube", "cheese", "tomato", "jalapeno", "chilli", "lettuce", "cucumber", "bell_pepper", "sphere", "cylinder", "Broccoli", "cabbage", "Carrot", "Eggplant", "Garlic", "Onion_green", "Parsley", "Onion", "Potato", "Radish"]
+module_dict_all['describe'] = ['cylinder', 'sphere', 'cube']
 
 #carrot, onion green, parsley
 # module_dict_all['describe'] = ["egg", "tomato", "jalapeno", "chilli"]
