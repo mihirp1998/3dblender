@@ -228,6 +228,7 @@ parser.add_argument("--do_random_shear", default=False, type=int, help="Randomly
 parser.add_argument("--do_random_scale", default=False, type=int, help="Randomly scale the object for single object case")
 parser.add_argument("--generate_day_scene", default=False, type=int, help="Scene will be brightly illuminated")
 parser.add_argument("--generate_night_scene", default=False, type=int, help="Scene will be dark")
+parser.add_argument("--generate_evening_scene", default=False, type=int, help="Scene will have normal illumination")
 parser.add_argument("--random_position_jitter", default=0, type=int, help="Random jitter added to object position")
 #TODO: correct this
 def isBlendFile(name):
@@ -705,12 +706,14 @@ def render_scene_with_tree(args,
         lamps = bpy.data.lamps
         for lamp in lamps:
             intensity = lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value
-            if not args.generate_day_scene and not args.generate_night_scene:
+            if not args.generate_day_scene and not args.generate_night_scene and not args.generate_evening_scene:
                 lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/7., intensity*5.)
             elif args.generate_day_scene:
                 lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity*3., intensity*5.)
             elif args.generate_night_scene:
                 lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/9., intensity/7.)
+            elif args.generate_evening_scene:
+                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = intensity
 
 
     if args.render_from_given_objects:
