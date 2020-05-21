@@ -11,6 +11,8 @@
 blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_LARGE_OBJ_256_A --max_objects 1 --single_center_object 1
 2. command to generate single object day scenes with jitter in position
 blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_DAY_OBJ_256_A --max_objects 1 --min_objects 1 --dynamic_lighting 1 --random_position_jitter 2 --generate_day_scene 1
+3. command to generate 2-3 object day scenes:
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_2_3_DAY_OBJ_256_A --max_objects 3 --min_objects 2 --dynamic_lighting 1 --random_position_jitter 0 --generate_day_scene 1
 '''
 # blender --background --python render_images.py -- --num_images 1000 --use_gpu 1 --height 128 --width 128 --dataset_name CLEVR_TEST
 from __future__ import print_function
