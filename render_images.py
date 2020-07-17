@@ -13,6 +13,10 @@ blender --background --python render_images.py -- --num_images 100000 --use_gpu 
 blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_DAY_OBJ_256_A --max_objects 1 --min_objects 1 --dynamic_lighting 1 --random_position_jitter 2 --generate_day_scene 1
 3. command to generate 2-3 object day scenes:
 blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_2_3_DAY_OBJ_256_A --max_objects 3 --min_objects 2 --dynamic_lighting 1 --random_position_jitter 0 --generate_day_scene 1
+4. command to generate empty day scenes:
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_EMPTY_DAY_256_D --max_objects 1 --min_objects 1 --dynamic_lighting 1 --generate_day_scene 1 --render_empty_scene 1
+5. command to generate single object, normal lighting, normal size, rotated
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_ROTATED_256_A --max_objects 1 --min_objects 1 --dynamic_lighting 0 --random_position_jitter 2 --do_random_rotation 1
 '''
 # blender --background --python render_images.py -- --num_images 1000 --use_gpu 1 --height 128 --width 128 --dataset_name CLEVR_TEST
 from __future__ import print_function
@@ -634,6 +638,22 @@ def render_scene_with_tree(args,
     scene_struct['directions']['above'] = tuple(plane_up)
     scene_struct['directions']['below'] = tuple(-plane_up)
 
+    ## Now we will vary the light intensity
+    if args.dynamic_lighting:
+        #1. get all lamps
+        lamps = bpy.data.lamps
+        for lamp in lamps:
+            intensity = lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value
+            if not args.generate_day_scene and not args.generate_night_scene and not args.generate_evening_scene:
+                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/7., intensity*5.)
+            elif args.generate_day_scene:
+                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity*3., intensity*5.)
+            elif args.generate_night_scene:
+                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/9., intensity/7.)
+            elif args.generate_evening_scene:
+                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = intensity
+
+
     if args.render_empty_scene:
         offset = 90
         if args.all_views:
@@ -702,22 +722,7 @@ def render_scene_with_tree(args,
 
 
     
-    ## Now we will vary the light intensity
-    if args.dynamic_lighting:
-        #1. get all lamps
-        lamps = bpy.data.lamps
-        for lamp in lamps:
-            intensity = lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value
-            if not args.generate_day_scene and not args.generate_night_scene and not args.generate_evening_scene:
-                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/7., intensity*5.)
-            elif args.generate_day_scene:
-                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity*3., intensity*5.)
-            elif args.generate_night_scene:
-                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/9., intensity/7.)
-            elif args.generate_evening_scene:
-                lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = intensity
-
-
+    
     if args.render_from_given_objects:
         # Read the specified objects json and render the given objects
         # with open(args.given_objects_json_path, 'rb') as f:
@@ -1292,6 +1297,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
             obj_name = utils.add_object_from_obj_file(args.shape_dir, obj_name, r, (x, y),  theta=theta, stored_location=stored_location, put_obj_inside=put_obj_inside, allow_floating=args.allow_floating_objects, args=args)
             mat_name_out = "dummy_mat" #TODO: probably set to actual material?
+            mat_name = mat_name_out
 
         obj = bpy.context.object
         blender_objects.append(obj)
