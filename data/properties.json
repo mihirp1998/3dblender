@@ -20,7 +20,8 @@
     "Parsley": "Parsley",
     "Onion": "Onion",
     "Potato": "Potato",
-    "Radish": "Radish"
+    "Radish": "Radish",
+    "model_normalized": "model_normalized"
 
   },
   "colors": {
