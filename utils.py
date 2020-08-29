@@ -145,6 +145,16 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   print("Filename from where object file will be loaded: ", filename)
 
   bpy.ops.import_scene.obj(filepath=filename)
+  # st()
+  
+  # obj_object = bpy.context.selected_objects[0]
+  # me = obj_object.data
+  # if me.uv_textures.active is not None:
+  #     for tf in me.uv_textures.active.data:
+  #         if tf.image:
+  #             img = tf.image.name
+  #             print(img)
+  
 
   # Give it a new name to avoid conflicts
   new_name = '%s_%d' % (name, count)
@@ -194,6 +204,7 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   obj = bpy.context.object
   lowest_pt = min([(obj.matrix_world * v.co).z for v in obj.data.vertices])
   obj.location.z -= lowest_pt
+  obj.location.z += 0.15
   #st()
   return new_name
 

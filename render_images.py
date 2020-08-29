@@ -12,7 +12,12 @@ blender --background --python render_images.py -- --num_images 100000 --use_gpu 
 
 2. Non rotated with 4 test views
 blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_NONROTATED_4VIEWS_OBJ_256_A --max_objects 1 --min_objects 1 --all_views 0
+
+3. Shapenet 
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SHAPENET_2 --max_objects 1 --min_objects 1
 '''
+
+
 # blender --background --python render_images.py -- --num_images 1000 --use_gpu 1 --height 128 --width 128 --dataset_name CLEVR_TEST
 from __future__ import print_function
 import ipdb
@@ -227,8 +232,9 @@ parser.add_argument("--dynamic_lighting", default=False, type=int, help="Dynamic
 parser.add_argument("--single_center_object", default=True, type=int, help="Renders a single object at the center of the scene")
 parser.add_argument("--do_random_rotation", default=False, type=int, help="Randomly rotate the object")
 parser.add_argument("--do_random_shear", default=False, type=int, help="Randomly shear the object")
-parser.add_argument("--do_random_scale", default=True, type=int, help="Randomly scale the object for single object case")
+parser.add_argument("--do_random_scale", default=False, type=int, help="Randomly scale the object for single object case")
 parser.add_argument("--make_ground_invisible", default=False, type=int, help="Make ground invisible")
+parser.add_argument("--convert_lamp_to_suns", default=False, type=int, help="convert_lamp_to_suns")
 
 #TODO: correct this
 def isBlendFile(name):
@@ -713,6 +719,34 @@ def render_scene_with_tree(args,
             intensity = lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value
             lamp.node_tree.nodes['Emission'].inputs['Strength'].default_value = np.random.uniform(intensity/7., intensity*5.)
 
+    if args.convert_lamp_to_suns:
+        lamps = bpy.data.lamps
+        # # st()
+        for lamp in lamps:
+            # Make light just directional, disable shadows.
+            lamp.type = 'SUN'
+            lamp.shadow_method = 'NOSHADOW'
+            # Possibly disable specular shading:
+            lamp.use_specular = False
+        
+        for obj in bpy.context.scene.objects:
+            if obj.type == 'LAMP':
+                obj.select = True
+            else:
+                obj.select = False
+
+        # for lamp in lamps:
+        #     lamp.select = True
+        bpy.ops.object.delete()
+
+        # Add another light source so stuff facing away from light is not completely dark
+        bpy.ops.object.lamp_add(type='SUN')
+        lamp2 = bpy.data.lamps['Sun']
+        lamp2.shadow_method = 'NOSHADOW'
+        lamp2.use_specular = False
+        lamp2.energy = 0.015
+        # bpy.data.objects['Sun'].rotation_euler = lamp.rotation_euler
+        bpy.data.objects['Sun'].rotation_euler[0] += 180
 
     if args.render_from_given_objects:
         # Read the specified objects json and render the given objects
@@ -1188,7 +1222,7 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
             if args.single_center_object:
                 # st()
-                r = 1.75
+                # r = 1.75
                 # st()
                 if args.do_random_scale:
                     r = np.random.uniform(0.75, 1.75)
@@ -1556,10 +1590,11 @@ def render_shadeless(blender_objects, path='flat.png'):
         render_args.engine = 'BLENDER_RENDER'
         render_args.use_antialiasing = False
 
-        utils.set_layer(bpy.data.objects['Lamp_Key'], 2)
-        utils.set_layer(bpy.data.objects['Lamp_Fill'], 2)
-        utils.set_layer(bpy.data.objects['Lamp_Back'], 2)
-        utils.set_layer(bpy.data.objects['Ground'], 2)
+        if not args.convert_lamp_to_suns:
+            utils.set_layer(bpy.data.objects['Lamp_Key'], 2)
+            utils.set_layer(bpy.data.objects['Lamp_Fill'], 2)
+            utils.set_layer(bpy.data.objects['Lamp_Back'], 2)
+            utils.set_layer(bpy.data.objects['Ground'], 2)
 
     # Add random shadeless materials to all objects
     object_colors = set()
@@ -1599,11 +1634,12 @@ def render_shadeless(blender_objects, path='flat.png'):
         utils.set_layer_new(bpy.data.objects['Lamp_Back'], coll1,coll2)
         utils.set_layer_new(bpy.data.objects['Ground'], coll1,coll2)
     else:
-        # Move the lights and ground back to layer 0
-        utils.set_layer(bpy.data.objects['Lamp_Key'], 0)
-        utils.set_layer(bpy.data.objects['Lamp_Fill'], 0)
-        utils.set_layer(bpy.data.objects['Lamp_Back'], 0)
-        utils.set_layer(bpy.data.objects['Ground'], 0)
+        if not args.convert_lamp_to_suns:
+            # Move the lights and ground back to layer 0
+            utils.set_layer(bpy.data.objects['Lamp_Key'], 0)
+            utils.set_layer(bpy.data.objects['Lamp_Fill'], 0)
+            utils.set_layer(bpy.data.objects['Lamp_Back'], 0)
+            utils.set_layer(bpy.data.objects['Ground'], 0)
 
     # Set the render settings back to what they were
     render_args.filepath = old_filepath
