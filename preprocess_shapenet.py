@@ -8,7 +8,7 @@ import subprocess
 import os
 import numpy as np
 import time
-
+import pathos.pools as pp
 st = ipdb.set_trace
 import bpy
 xmax, ymax, zmax = 5.0, 5.0, 5.0
@@ -127,98 +127,153 @@ def scene_setting_init(use_gpu):
 # root = "/projects/katefgroup/datasets/shamit_shapenet/ShapeNetCore.v2"
 root = "/home/mprabhud/dataset/keypoint_net/models/ShapeNetCore.v2"
 # init()
-init_all()
+# init_all()
 # cars: 02958343
 instance_id_list = []
-for classes in os.listdir(root):
-    # st()
-    if not classes == '02958343':
-        continue
+
+def job(instances):
+    st()
+    classes = '02958343'
     class_path = os.path.join(root, classes)
-    for instances in os.listdir(class_path):
-        model_dir = os.path.join(class_path, instances, "models")
-        obj_filename = os.path.join(class_path, instances, "models", "model_normalized.obj")
-        instance_id = classes + "_" + instances
-        instance_id_list.append(instance_id)
-        # target_filename = os.path.join(class_path, instances, "models", instance_id + ".obj")
-        target_filename = os.path.join('/home/mprabhud/dataset/preprocessed_shapenet_gpu', instance_id + ".obj")
+    model_dir = os.path.join(class_path, instances, "models")
+    obj_filename = os.path.join(class_path, instances, "models", "model_normalized.obj")
+    instance_id = classes + "_" + instances
+    instance_id_list.append(instance_id)
+    # target_filename = os.path.join(class_path, instances, "models", instance_id + ".obj")
+    target_filename = os.path.join('/home/mprabhud/dataset/preprocessed_shapenet_2', instance_id + ".obj")
 
-        # Delete everything
-        for obj in bpy.context.scene.objects:
-            obj.select = True
-        bpy.ops.object.delete()
-        # clear_mesh()
+    # Delete everything
+    for obj in bpy.context.scene.objects:
+        obj.select = True
+    bpy.ops.object.delete()
+    # clear_mesh()
 
-        imported_object = bpy.ops.import_scene.obj(filepath=obj_filename)
-        combine_objects()
-        # st()
+    imported_object = bpy.ops.import_scene.obj(filepath=obj_filename)
+    combine_objects()
+    # st()
 
-        obj_object = bpy.context.selected_objects[0]
-        # me = obj_object.data
-        # if me.uv_textures.active is not None:
-        #     for tf in me.uv_textures.active.data:
-        #         if tf.image:
-        #             st()
-        #             img = tf.image.name
-        #             print(img)
+    obj_object = bpy.context.selected_objects[0]
+    # me = obj_object.data
+    # if me.uv_textures.active is not None:
+    #     for tf in me.uv_textures.active.data:
+    #         if tf.image:
+    #             st()
+    #             img = tf.image.name
+    #             print(img)
 
-        obj_object.name = instance_id #"model_normalized"
-        obj_object.data.name = instance_id
+    obj_object.name = instance_id #"model_normalized"
+    obj_object.data.name = instance_id
 
-        x = obj_object.dimensions[0]
-        y = obj_object.dimensions[1]
-        z = obj_object.dimensions[2]
-        mini = min(xmax/x, ymax/y, zmax/z)
-        bpy.ops.transform.resize(value=(mini, mini, mini))
-        move_obj_above_ground(obj_object)
-        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
-        bpy.ops.export_scene.obj(filepath=target_filename)
-        # st()
-        # aa=1
+    x = obj_object.dimensions[0]
+    y = obj_object.dimensions[1]
+    z = obj_object.dimensions[2]
+    mini = min(xmax/x, ymax/y, zmax/z)
+    bpy.ops.transform.resize(value=(mini, mini, mini))
+    move_obj_above_ground(obj_object)
+    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+    bpy.ops.export_scene.obj(filepath=target_filename)
 
-        # new_img_dir = os.path.join(model_dir, instance_id)
-        # old_img_dir  = os.path.join(class_path, instances, "images")
-        # if os.path.exists(new_img_dir):
-        #     shutil.rmtree(new_img_dir)
-        # # os.mkdir(new_img_dir)
-        # if os.path.exists(old_img_dir):
-        #     shutil.copytree(old_img_dir, new_img_dir)
 
-        # # st()
-        # mtl_file_path = os.path.join(model_dir, instance_id + ".mtl")
-        # new_mtl_file_path = os.path.join(model_dir, instance_id + "_.mtl")
-        # mtl_file = open(mtl_file_path, 'r')
-        # new_mtl_file = open(new_mtl_file_path, 'w')
-        # for line in mtl_file.readlines():
-        #     # st()
-        #     if 'map_Kd' in line:
-        #         st()
-        #         texture_name = line.split('/')[-1]
-        #         new_mtl_file.write('map_Kd ' + instance_id + "/images/" + texture_name + "\n")
-        #     else:
-        #         new_mtl_file.write(line)
+classes = '02958343'
+class_path = os.path.join(root, classes)
+instances = os.listdir(class_path)
+instances = instances[:100]
+p = pp.ProcessPool(1)
+jobs = sorted(list(enumerate(instances)))
+# st()
+print(jobs)
+p.map(job, jobs, chunksize = 1)
 
-        # mtl_file.close()
-        # new_mtl_file.close()
-        # # st()
-        # # os.remove(mtl_file_path)
-        # os.rename(new_mtl_file_path, mtl_file_path)
 
-dict_file = open("/home/mprabhud/shamit/shapenet_preprocess/dict_file.txt", "w")
+# for classes in os.listdir(root):
+#     # st()
+#     if not classes == '02958343':
+#         continue
+#     class_path = os.path.join(root, classes)
+#     for instances in os.listdir(class_path):
+#         model_dir = os.path.join(class_path, instances, "models")
+#         obj_filename = os.path.join(class_path, instances, "models", "model_normalized.obj")
+#         instance_id = classes + "_" + instances
+#         instance_id_list.append(instance_id)
+#         # target_filename = os.path.join(class_path, instances, "models", instance_id + ".obj")
+#         target_filename = os.path.join('/home/mprabhud/dataset/preprocessed_shapenet_gpu', instance_id + ".obj")
 
-dict_file.write('[')
-for cnt, instanceid in enumerate(instance_id_list):
-    if cnt == len(instance_id_list) - 1:
-        dict_file.write("'{}'".format(instanceid))
-    else:
-        dict_file.write("'{}',".format(instanceid))
-dict_file.write(']')
-dict_file.close()
+#         # Delete everything
+#         for obj in bpy.context.scene.objects:
+#             obj.select = True
+#         bpy.ops.object.delete()
+#         # clear_mesh()
 
-json_file = open("/home/mprabhud/shamit/shapenet_preprocess/json_file.txt", "w")
-for cnt, instanceid in enumerate(instance_id_list):
-    json_file.write('"{}":"{}"'.format(instance_id, instance_id))
-json_file.close()
+#         imported_object = bpy.ops.import_scene.obj(filepath=obj_filename)
+#         combine_objects()
+#         # st()
+
+#         obj_object = bpy.context.selected_objects[0]
+#         # me = obj_object.data
+#         # if me.uv_textures.active is not None:
+#         #     for tf in me.uv_textures.active.data:
+#         #         if tf.image:
+#         #             st()
+#         #             img = tf.image.name
+#         #             print(img)
+
+#         obj_object.name = instance_id #"model_normalized"
+#         obj_object.data.name = instance_id
+
+#         x = obj_object.dimensions[0]
+#         y = obj_object.dimensions[1]
+#         z = obj_object.dimensions[2]
+#         mini = min(xmax/x, ymax/y, zmax/z)
+#         bpy.ops.transform.resize(value=(mini, mini, mini))
+#         move_obj_above_ground(obj_object)
+#         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+#         bpy.ops.export_scene.obj(filepath=target_filename)
+#         # st()
+#         # aa=1
+
+#         # new_img_dir = os.path.join(model_dir, instance_id)
+#         # old_img_dir  = os.path.join(class_path, instances, "images")
+#         # if os.path.exists(new_img_dir):
+#         #     shutil.rmtree(new_img_dir)
+#         # # os.mkdir(new_img_dir)
+#         # if os.path.exists(old_img_dir):
+#         #     shutil.copytree(old_img_dir, new_img_dir)
+
+#         # # st()
+#         # mtl_file_path = os.path.join(model_dir, instance_id + ".mtl")
+#         # new_mtl_file_path = os.path.join(model_dir, instance_id + "_.mtl")
+#         # mtl_file = open(mtl_file_path, 'r')
+#         # new_mtl_file = open(new_mtl_file_path, 'w')
+#         # for line in mtl_file.readlines():
+#         #     # st()
+#         #     if 'map_Kd' in line:
+#         #         st()
+#         #         texture_name = line.split('/')[-1]
+#         #         new_mtl_file.write('map_Kd ' + instance_id + "/images/" + texture_name + "\n")
+#         #     else:
+#         #         new_mtl_file.write(line)
+
+#         # mtl_file.close()
+#         # new_mtl_file.close()
+#         # # st()
+#         # # os.remove(mtl_file_path)
+#         # os.rename(new_mtl_file_path, mtl_file_path)
+
+# # dict_file = open("/home/mprabhud/shamit/shapenet_preprocess/dict_file.txt", "w")
+
+# # dict_file.write('[')
+# # for cnt, instanceid in enumerate(instance_id_list):
+# #     if cnt == len(instance_id_list) - 1:
+# #         dict_file.write("'{}'".format(instanceid))
+# #     else:
+# #         dict_file.write("'{}',".format(instanceid))
+# # dict_file.write(']')
+# # dict_file.close()
+
+# # json_file = open("/home/mprabhud/shamit/shapenet_preprocess/json_file.txt", "w")
+# # for cnt, instanceid in enumerate(instance_id_list):
+# #     json_file.write('"{}":"{}"'.format(instance_id, instance_id))
+# # json_file.close()
 
 
 

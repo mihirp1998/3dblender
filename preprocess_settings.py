@@ -68,7 +68,7 @@ g_resolution_percentage = 100
 
 #performance:
 
-g_gpu_render_enable = True
+g_gpu_render_enable = False
 
 #if you are using gpu render, recommand to set hilbert spiral to 256 or 512
 #default value for cpu render is fine
