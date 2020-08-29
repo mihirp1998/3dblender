@@ -44,10 +44,26 @@ def move_obj_above_ground(mesh_obj):
     
     mesh_obj.location.z = mesh_obj.location.z - minz + 0.3
 
+def clear_mesh():
+    """ clear all meshes in the secene
+    """
+    bpy.ops.object.select_all(action='DESELECT')
+    for obj in bpy.data.objects:
+        if obj.type == 'MESH':
+            obj.select = True
+    bpy.ops.object.delete()
+
+def init():
+    render_args = bpy.context.scene.render
+    render_args.engine = "CYCLES"
+    bpy.data.worlds['World'].cycles.sample_as_light = True
+    bpy.context.scene.cycles.blur_glossy = 2.0
+
 # obj_filename = '/home/shamitl/blender_stuff/8d458ab12073c371caa2c06fded3ca21/models/model_normalized.obj'
 # target_filename = '/home/shamitl/projects/3dblender/data/shapes/model_normalized.obj'
 
 root = "/projects/katefgroup/datasets/shamit_shapenet/ShapeNetCore.v2"
+init()
 
 for classes in os.listdir(root):
     class_path = os.path.join(root, classes)
@@ -57,16 +73,18 @@ for classes in os.listdir(root):
         instance_id = classes + "_" + instances
         target_filename = os.path.join(class_path, instances, "models", instance_id + ".obj")
 
-        # Delete everything
-        for obj in bpy.context.scene.objects:
-            obj.select = True
-        bpy.ops.object.delete()
+        # # Delete everything
+        # for obj in bpy.context.scene.objects:
+        #     obj.select = True
+        # bpy.ops.object.delete()
+        clear_mesh()
 
         imported_object = bpy.ops.import_scene.obj(filepath=obj_filename)
         combine_objects()
+        # st()
 
         obj_object = bpy.context.selected_objects[0]
-        # st()
+
         obj_object.name = instance_id #"model_normalized"
         obj_object.data.name = instance_id
 
