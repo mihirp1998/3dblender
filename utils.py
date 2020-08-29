@@ -140,7 +140,8 @@ def add_object_from_obj_file(object_dir, name, scale, loc, theta=0, stored_locat
   # bpy.ops.wm.append(filename=filename)
   
   filename = os.path.join(object_dir, '%s.obj' % name)
-  filename = './data/shapes/' + name + ".obj" 
+  # filename = './data/shapes/' + name + ".obj" 
+  # filename = 
 
   print("Filename from where object file will be loaded: ", filename)
 

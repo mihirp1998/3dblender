@@ -14,7 +14,10 @@ blender --background --python render_images.py -- --num_images 100000 --use_gpu 
 blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_NONROTATED_4VIEWS_OBJ_256_A --max_objects 1 --min_objects 1 --all_views 0
 
 3. Shapenet 
-blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SHAPENET_2 --max_objects 1 --min_objects 1
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SHAPENET_CARS_A --max_objects 1 --min_objects 1 --shape_dir /home/mprabhud/dataset/preprocessed_shapenet_4
+
+4. Shapenet cars
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SHAPENET_CARS_D --max_objects 1 --min_objects 1 --shape_dir /home/mprabhud/dataset/preprocessed_shapenet_4
 '''
 
 
@@ -90,7 +93,7 @@ parser.add_argument('--properties_json', default='data/properties.json',
                          "rescale object models; the \"materials\" and \"shapes\" fields map " +
                          "from CLEVR material and shape names to .blend files in the " +
                          "--object_material_dir and --shape_dir directories respectively.")
-parser.add_argument('--shape_dir', default='data/shapes',
+parser.add_argument('--shape_dir', default='./data/shapes',
                     help="Directory where .blend files for object models are stored")
 parser.add_argument('--material_dir', default='data/materials',
                     help="Directory where .blend files for materials are stored")
@@ -108,7 +111,7 @@ parser.add_argument('--min_dist', default=0.2, type=float,
                     help="The minimum allowed distance between object centers")
 parser.add_argument('--min_obj_2d_size', default=10, type=float,
                     help="The minimum allowed 2d bounding box size of generated objects")
-parser.add_argument('--radius', default=13, type=float,
+parser.add_argument('--radius', default=8, type=float,
                     help="The distance of the camera from the origin from where the images are rendered")
 parser.add_argument('--scene_size', default=8, type=float,
                     help="The distance of the camera from the origin from where the images are rendered")
