@@ -11,6 +11,8 @@ import time
 import pathos.pools as pp
 # st = ipdb.set_trace
 import bpy
+import ipdb 
+st = ipdb.set_trace
 xmax, ymax, zmax = 5.0, 5.0, 5.0
 # from preprocess_settings import *
 # blender --background --python preprocess_shapenet.py
@@ -52,6 +54,7 @@ def job(instances):
                 minz = v_world[2]
         
         mesh_obj.location.z = mesh_obj.location.z - minz + 0.3
+        return 0 - minz + 0.3
 
     def clear_mesh():
         """ clear all meshes in the secene
@@ -186,22 +189,32 @@ def job(instances):
     z = obj_object.dimensions[2]
     mini = min(xmax/x, ymax/y, zmax/z)
     bpy.ops.transform.resize(value=(mini, mini, mini))
-    move_obj_above_ground(obj_object)
+    disp = move_obj_above_ground(obj_object)
     bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
-    bpy.ops.export_scene.obj(filepath=target_filename)
+    # bpy.ops.export_scene.obj(filepath=target_filename)
+    return {instance_id:{"scale": mini, "disp":disp}}
 
 
 classes = '02958343'
 import os
+import json 
 class_path = os.path.join(root, classes)
 instances = os.listdir(class_path)
-instances = instances[:100]
+# instances = instances[:2]
 p = pp.ProcessPool(8)
 jobs = sorted(list(enumerate(instances)))
 # st()
 print(jobs)
-p.map(job, jobs, chunksize = 1)
+results = p.map(job, jobs, chunksize = 1)
+result_dict = {}
+for result in results:
+    
+    instance_id = list(result.keys())[0]
+    result_dict[instance_id] = result[instance_id]
 
+json_path = "/home/mprabhud/dataset/shapenet_scale_disp_files/" + classes + ".json"
+with open(json_path, 'w') as outfile:
+    json.dump(result_dict, outfile)
 
 # for classes in os.listdir(root):
 #     # st()
