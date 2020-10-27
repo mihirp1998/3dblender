@@ -14,6 +14,8 @@ import bpy
 import ipdb 
 st = ipdb.set_trace
 xmax, ymax, zmax = 5.0, 5.0, 5.0
+
+#'04530566'#'03624134'#'03467517'#'02876657'#'03797390'#'03642806'#'03513137'#'03001627'#'02818832'
 # from preprocess_settings import *
 # blender --background --python preprocess_shapenet.py
 # obj_filename = '/home/shamitl/blender_stuff/8d458ab12073c371caa2c06fded3ca21/models/model_normalized.obj'
@@ -153,7 +155,7 @@ def job(instances):
     xmax, ymax, zmax = 5.0, 5.0, 5.0    
     instances = instances[1]
     print(instances[0])
-    classes = '02958343'
+    classes = '02691156'#'04530566'#'04225987'#'03790512'#'03624134'#'03467517'#'02876657'#'02808440'#'04379243'#'03797390'#'03642806'#'03513137'#'03001627'#'02954340'#'02818832'#'02958343'
     class_path = os.path.join(root, classes)
     model_dir = os.path.join(class_path, instances, "models")
     obj_filename = os.path.join(class_path, instances, "models", "model_normalized.obj")
@@ -191,11 +193,11 @@ def job(instances):
     bpy.ops.transform.resize(value=(mini, mini, mini))
     disp = move_obj_above_ground(obj_object)
     bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
-    # bpy.ops.export_scene.obj(filepath=target_filename)
+    bpy.ops.export_scene.obj(filepath=target_filename)
     return {instance_id:{"scale": mini, "disp":disp}}
 
 
-classes = '02958343'
+classes = '02691156'#'04530566'#'04225987'#'03790512'#'03624134'#'03467517'#'02876657'#'02808440'#'04379243'#'03797390'#'03642806'#'03513137'#'03001627'#'02954340'#'02818832'#'02958343'
 import os
 import json 
 class_path = os.path.join(root, classes)
