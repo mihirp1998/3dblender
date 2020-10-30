@@ -12,7 +12,11 @@ blender --background --python render_images.py -- --num_images 100000 --use_gpu 
 2. command to generate single object day scenes with jitter in position
 blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_SINGLE_DAY_OBJ_256_A --max_objects 1 --min_objects 1 --dynamic_lighting 1 --random_position_jitter 2 --generate_day_scene 1
 3. command to generate 2-3 object day scenes:
-blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_2_3_DAY_OBJ_256_A --max_objects 3 --min_objects 2 --dynamic_lighting 1 --random_position_jitter 0 --generate_day_scene 1
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_2_3_OBJ_DAY_256_A --max_objects 3 --min_objects 2 --dynamic_lighting 1 --random_position_jitter 0 --generate_day_scene 1
+4. 2 obj scenes
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_2_OBJ_256_D --max_objects 2 --min_objects 2 --all_views 0
+5. 1 obj scenes
+blender --background --python render_images.py -- --num_images 100000 --use_gpu 1 --height 256 --width 256 --dataset_name CLEVR_1_OBJ_256_D --max_objects 1 --min_objects 1 --single_center_object 1 --do_random_scale 1 --all_views 0 --random_position_jitter 4
 '''
 # blender --background --python render_images.py -- --num_images 1000 --use_gpu 1 --height 128 --width 128 --dataset_name CLEVR_TEST
 from __future__ import print_function
@@ -223,7 +227,7 @@ parser.add_argument('--zero_shot', default=0, type=int,
 parser.add_argument('--add_layout_prob', default=0.5, type=float,
                     help="probability of adding an extra layout layer")
 parser.add_argument("--render_empty_scene", default=False, type=int, help="Generates scenes with no objects present")
-parser.add_argument("--dynamic_lighting", default=True, type=int, help="Dynamically changes light intensity for each scene")
+parser.add_argument("--dynamic_lighting", default=False, type=int, help="Dynamically changes light intensity for each scene")
 parser.add_argument("--single_center_object", default=False, type=int, help="Renders a single object at the center of the scene")
 parser.add_argument("--do_random_rotation", default=False, type=int, help="Randomly rotate the object")
 parser.add_argument("--do_random_shear", default=False, type=int, help="Randomly shear the object")
@@ -736,8 +740,9 @@ def render_scene_with_tree(args,
             PHIS = list(range(20, 80, 20))
             PHIS.insert(0, 12)
         else:
-            THETAS = list(range(0+offset, 360+offset, 90))
-            PHIS = [40]
+            THETAS = list(range(0+offset, 360+offset, 60))
+            PHIS = list(range(20, 80, 20))
+            # PHIS = [40]
 
         image_name = os.path.basename(output_image).split('.png')[0]
         output_image = os.path.join(os.path.dirname(output_image), image_name)
@@ -927,8 +932,10 @@ def render_scene_with_tree(args,
         PHIS = list(range(20, 80, 20))
         # PHIS.insert(0, 12)
     else:
-        THETAS = list(range(0+offset, 360+offset, 90))
-        PHIS = [40]
+        # THETAS = list(range(0+offset, 360+offset, 90))
+        # PHIS = [40]
+        THETAS = list(range(0+offset, 360+offset, 60))
+        PHIS = list(range(20, 80, 20))
 
     image_name = os.path.basename(output_image).split('.png')[0]
     output_image = os.path.join(os.path.dirname(output_image), image_name)
@@ -1195,10 +1202,10 @@ def add_objects_from_tree(scene_struct, args, camera, tree_max_level):
 
             if args.single_center_object:
                 # st()
-                r = 1.75
+                r = 1.3
                 # st()
                 if args.do_random_scale:
-                    r = np.random.uniform(0.75, 1.75)
+                    r = np.random.uniform(0.75, 1.3)
                 specified_obj.attributes['size']=Combine('size','xlarge')
                 if specified_obj.object_type in ["Carrot", "Onion_green", "Parsley"]:
                     # These objects are long. Keep scale = 1 for them.
